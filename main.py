@@ -84,7 +84,7 @@ for child in topFrame.winfo_children():
 # 创建子组件字典，避免 O(n) 的遍历操作
 children = {child["text"]: child for child in topFrame.winfo_children()}
 
-syntaxConfiguration("GrammaticalColors.txt", text)
+syntaxConfiguration("GrammaticalColors.txt")
 
 # 为文本框绑定按键事件
 text.bind("<Tab>", lambda event: insertTab(text, tk))

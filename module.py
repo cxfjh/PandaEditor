@@ -57,7 +57,8 @@ def openFile(filedialog, text, topFrame, tk):
     nameFile = os.path.splitext(os.path.basename(filePath))[0]  # 获取文件名（不包含扩展名）
     newFile = os.path.join(os.path.dirname(filePath), "源文件", nameFile)  # 设置文件的储存目录
     fileName = nameFile + ".py"  # 设置文件名为 文件名.py
-
+    highlightKeywords(text)
+    
     # 解除禁用其他按钮
     for child in topFrame.winfo_children():
         if isinstance(child, tk.Button) and child["text"] == "编译代码": child["state"] = "normal"
@@ -210,11 +211,11 @@ def styleRecovery(file, text):
 
 
 # 语法高亮恢复
-def syntaxConfiguration(file, text):
+def syntaxConfiguration(file):
     try:
-        global grammaticalColors
+        if restoreHistory(file) is None: return
+        global grammaticalColors 
         grammaticalColors = restoreHistory(file).lower() == "true"
-        if grammaticalColors is None: return
     except Exception as e: messagebox.showinfo("配置提示", "语法高亮恢复恢复时出错")    
 
 
