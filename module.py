@@ -239,32 +239,32 @@ def onClosing(root, text):
     root.destroy()
 
 
-# 初始化
-def init(topFrame, tk):
-    if sys.version_info.major < 3: return hideButton(topFrame, tk, '编译代码', '运行代码')
-    try: import PyInstaller
-    except ImportError:
-        try:
-            response = urllib.request.urlopen('http://www.baidu.com', timeout=1)
-            if response.getcode() == 200:
-                try:
-                    hideButton(topFrame, tk, '编译代码', '空')
-                    subprocess.check_call(["pip", "install", "pyinstaller"])
-                    messagebox.showinfo("熊猫编辑器", "配置环境成功\n需要重新启动程序才能使用<编译代码>功能")
-                except Exception as e: hideButton(topFrame, tk, '编译代码', '空')
-            else: hideButton(topFrame, tk, '编译代码', '空')
-        except Exception as e: hideButton(topFrame, tk, '编译代码', '空')
+# # 初始化
+# def init(topFrame, tk):
+#     if sys.version_info.major < 3: return hideButton(topFrame, tk, '编译代码', '运行代码')
+#     try: import PyInstaller
+#     except ImportError:
+#         try:
+#             response = urllib.request.urlopen('http://www.baidu.com', timeout=1)
+#             if response.getcode() == 200:
+#                 try:
+#                     hideButton(topFrame, tk, '编译代码', '空')
+#                     subprocess.Popen([sys.executable, "-m", "pip", "install", "pyinstaller"]).wait()
+#                     messagebox.showinfo("熊猫编辑器", "配置环境成功\n需要重新启动程序才能使用<编译代码>功能")
+#                 except Exception as e: hideButton(topFrame, tk, '编译代码', '空')
+#             else: hideButton(topFrame, tk, '编译代码', '空')
+#         except Exception as e: hideButton(topFrame, tk, '编译代码', '空')
 
 
-# 隐藏按钮
-def hideButton(topFrame, tk, text1, text2, hide=True):
-    buttons = [child for child in topFrame.winfo_children() if isinstance(child, tk.Button)]
-    buttons = [button for button in buttons if button["text"] in (text1, text2)]
-    [button.pack_forget() if hide else button.pack() for button in buttons]
+# # 隐藏按钮
+# def hideButton(topFrame, tk, text1, text2, hide=True):
+#     buttons = [child for child in topFrame.winfo_children() if isinstance(child, tk.Button)]
+#     buttons = [button for button in buttons if button["text"] in (text1, text2)]
+#     [button.pack_forget() if hide else button.pack() for button in buttons]
 
 
-# 判断是否安装环境
-def disposition(topFrame, tk): threading.Thread(target=lambda: init(topFrame, tk)).start()
+# # 判断是否安装环境
+# def disposition(topFrame, tk): threading.Thread(target=lambda: init(topFrame, tk)).start()
 
 
 # 语法高亮

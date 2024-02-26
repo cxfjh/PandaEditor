@@ -17,7 +17,6 @@ from module import (
     insertTab,
     windowRecovery,
     styleRecovery,
-    disposition,
     ctrlS,
     onClosing,
     highlightKeywords,
@@ -98,7 +97,6 @@ windowRecovery("WindowConfiguration.txt", root)
 styleRecovery("ColorConfiguration.txt", text)
 
 # 初始化界面布局
-disposition(topFrame, tk)
 highlightKeywords(text)
 
 # 缓存目录
