@@ -1,0 +1,2 @@
+module examples
+plugin pyqt6qmlplugin
