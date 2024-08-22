@@ -1,4 +1,0 @@
-PyQt6 ; python_version <= '3.11.9'
-keyboard
-psutil
-re
