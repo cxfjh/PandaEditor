@@ -1,0 +1,4 @@
+panda_editor/*
+*.pyd
+*.pyc
+*.dll
