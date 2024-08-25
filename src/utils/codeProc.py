@@ -6,7 +6,7 @@ import subprocess # 子进程库 运行命令
 from tkinter import messagebox # 弹窗库 显示提示信息
 from src.utils.config import getFileConfig # 导入JSON库 读取配置文件
 from src.views.mainWin import setMistake # 导入主窗口函数 显示错误信息
-from src.StandardLibrary.StandardLibrary import Grammar, Symbols  # 导入标准库
+from src.StandardLibrary.StandardLibrary import Grammar, Symbols, Character  # 导入标准库
 
 
 # 解析中文字符代码
@@ -18,10 +18,13 @@ def parseCode(string):
 
         pattern = r'(?<![\w\u4e00-\u9fff])(' + '|'.join(map(re.escape, Grammar.keys())) + r')(?![\w\u4e00-\u9fff])' # 匹配关键字
         result = re.compile(pattern).sub(lambda match: Grammar[match.group(0)], string) # 替换关键字
-        
-        for placeholder, part in tempPlaceholders.items(): result = result.replace(placeholder, part) # 恢复保护部分
+
         replacementPattern = re.compile('|'.join(map(re.escape, Symbols.keys()))) # 匹配符号
         result = replacementPattern.sub(lambda match: Symbols[match.group(0)], result) # 替换符号
+
+        for placeholder, part in tempPlaceholders.items(): result = result.replace(placeholder, part) # 恢复保护部分
+        stringSubstitution =  re.compile('|'.join(map(re.escape, Character.keys()))) # 匹配字符串符号
+        result = stringSubstitution.sub(lambda match: Character[match.group(0)], result) # 替换字符串符号
 
         with open(getFileConfig("CodeFilePath"), 'w', encoding='utf-8') as f: f.write(result) # 保存临时文件
 
