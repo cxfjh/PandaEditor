@@ -8,13 +8,14 @@ import src.StandardLibrary.BuiltinLibraries as BuiltinLibraries # 导入内置�
 import src.StandardLibrary.BuiltinMethods as BuiltinMethods # 标准库内置方法
 import src.StandardLibrary.PunctuationMark as PunctuationMark # 导入标点符号
 import src.StandardLibrary.ExpressionSymbols as ExpressionSymbols # 导入运算符
+import src.StandardLibrary.StringSymbols as StringSymbols # 导入字符串符号
 
 
 # 处理关键字
 def processKeywords(dictionaries): return [[item for pair in d.items() for item in pair] for d in dictionaries]
 
 # 处理关键字
-result = processKeywords([BuiltinLibraryMethods.BuiltinLibraryMethods, KeyWords.KeyWords, BuiltinLibraries.BuiltinLibraries, BuiltinMethods.BuiltinMethods, PunctuationMark.PunctuationMark, ExpressionSymbols.ExpressionSymbols ])
+result = processKeywords([BuiltinLibraryMethods.BuiltinLibraryMethods, KeyWords.KeyWords, BuiltinLibraries.BuiltinLibraries, BuiltinMethods.BuiltinMethods, PunctuationMark.PunctuationMark, ExpressionSymbols.ExpressionSymbols, StringSymbols.StringSymbols ])
 charactersFilter = set('()+*[]?') # 定义要过滤的字符集合
 result = [[item for item in sublist if item not in charactersFilter] for sublist in result] # 进行过滤操作
 
@@ -53,6 +54,7 @@ class ChineseHighlighter(QSyntaxHighlighter):
         rules += [(r'(?<!\p{Han})%s(?!\p{Han})' % w, 0, ChineseHighlighter.STYLES['BuiltinMethods']) for w in result[3]] # 关键字匹配规则
         rules += [(r'%s' % b, 0, ChineseHighlighter.STYLES['PunctuationMark']) for b in result[4]]
         rules += [(r'%s' % b, 0, ChineseHighlighter.STYLES['ExpressionSymbols']) for b in result[5]]
+        rules += [(r'%s' % b, 0, ChineseHighlighter.STYLES['PunctuationMark']) for b in result[6]]
         self.rules = [(QRegularExpression(pat), index, fmt) for (pat, index, fmt) in rules]  # 规则列表转换为元组列表
         
 
