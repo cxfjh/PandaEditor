@@ -15,3 +15,4 @@
 - 修复了字符串中的关键字被替换问题
 - [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v1.0.1)
 - [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
+
