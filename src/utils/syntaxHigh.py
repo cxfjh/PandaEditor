@@ -1,3 +1,5 @@
+# 实现语法高亮功能
+
 from PyQt6.QtWidgets import * # 导入PyQt6的全部类
 from PyQt6.QtGui import * # 导入PyQt6的全部类
 from PyQt6.QtCore import * # 导入PyQt6的全部类

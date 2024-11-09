@@ -1,5 +1,5 @@
 import os # 导入os模块 处理文件路径
-from src.utils.config import readConfig, writeConfig, getFileConfig # 导入配置文件读写函数
+from src.utils.Config import readConfig, writeConfig, getFileConfig # 导入配置文件读写函数
 from tkinter import messagebox # 弹窗库 显示提示信息
 from PyQt6.QtCore import pyqtSignal, QObject # 导入PyQt6模块的核心类
 from PyQt6 import QtCore, QtGui, QtWidgets  # 导入PyQt6模块的全部类

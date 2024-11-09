@@ -30,15 +30,15 @@
 
 ## 开发团队
 
-- 熊猫编辑器是由[星科熊猫团队](https://cxfjh.github.io/)开发、设计、运营与维护的。
+- 熊猫编辑器是由[星科熊猫团队](https://cxfjh.github.io/PandaEditorHub/)开发、设计、运营与维护的。
 
 ## 代码编写规范
 
-详细的使用说明请参见 [教程规范](USAGE.md)。
+详细的使用说明请参见 [教程规范](docs/USAGE.md)。
 
 ## 更新日志
 
-- [更新日志](CHANGELOG.md)。
+- [更新日志](docs/CHANGELOG.md)。
 
 ## 联系我们
 
@@ -52,7 +52,7 @@
 
 ## 官方网站
 
-- [PandaEditor](https://cxfjh.github.io/)
+- [PandaEditor](https://cxfjh.github.io/PandaEditorHub/)
 
 ## 开源协议
 

@@ -1,7 +1,9 @@
+# 用于处理文件相关操作
+
 import os  # 导入系统库 处理文件路径
-from src.utils.config import getFileConfig, setFileConfig  # 导入配置文件读写函数
+from src.utils.Config import getFileConfig, setFileConfig  # 导入配置文件读写函数
 from tkinter import filedialog, messagebox  # 导入文件选择框和弹窗提示库
-from src.views.mainWin import setFilePath # 导入 UI 类
+from src.views.MainWin import setFilePath # 导入 UI 类
 
 
 # 分割文件路径和文件名

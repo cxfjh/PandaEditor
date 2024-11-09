@@ -1,9 +1,11 @@
+# 用于设置页面的功能函数
+
 import os # 导入os模块 处理文件和目录
 import psutil # 导入psutil模块 处理进程
 import shutil # 导入shutil模块 处理文件和目录
 import subprocess # 导入subprocess模块 运行外部程序
 from tkinter import messagebox # 弹窗库 处理弹窗
-from src.utils.config import getFileConfig, initFileConfig # 处理操作配置文件
+from src.utils.Config import getFileConfig, initFileConfig # 处理操作配置文件
 
 
 # 重置程序
@@ -19,7 +21,7 @@ def resetProgram():
     except: messagebox.showerror('错误', '重置程序失败，请检查配置文件，或使用管理员身份运行程序！(8380)') # 弹窗提示删除失败
 
 
-# 卸载程序
+# 卸载程序（脚本运行没有此功能）
 def uninstallProgram():
     try: 
         if messagebox.askyesno('提示', '确定要卸载程序吗？'):

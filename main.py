@@ -1,7 +1,7 @@
 import sys # 导入 sys 模块 处理命令行参数
 import asyncio # 导入 asyncio 模块 异步执行
-from src.utils.config import initFileConfig # 导入初始化配置文件
-from src.views.mainWin import Ui_MainWindow # 导入 UI 类
+from src.utils.Config import initFileConfig # 导入初始化配置文件
+from src.views.MainWin import Ui_MainWindow # 导入 UI 类
 from PyQt6.QtWidgets import QApplication, QMainWindow # 导入 PyQt6 库 处理 UI 相关
 
 
