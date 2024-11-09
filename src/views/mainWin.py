@@ -255,7 +255,7 @@ class Ui_MainWindow(object):
         self.action_14.triggered.connect(resetProgram)  # 绑定重置程序操作
         self.action_10.triggered.connect(self.setWin.show)  # 绑定视图设置操作
         self.action_12.triggered.connect(lambda: os.startfile('https://cxfjh.github.io/PandaEditorHub/'))  # 绑定更新程序操作
-        self.action_8.triggered.connect(lambda: os.startfile('https://github.com/cxfjh/PandaEditor/blob/main/USAGE.md'))  # 绑定使用教程操作
+        self.action_8.triggered.connect(lambda: os.startfile('https://github.com/cxfjh/PandaEditor/blob/main/docs/USAGE.md'))  # 绑定使用教程操作
 
         # # 快捷键设置
         keyboard.add_hotkey('Ctrl+O', lambda: (openFile(), self.plainTextEdit.setPlainText(getText())))  # 绑定Ctrl+O快捷键打开文件
