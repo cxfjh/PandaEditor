@@ -22,7 +22,7 @@ def resetProgram():
 def uninstallProgram():
     try:
         if messagebox.askyesno('卸载程序', '确定要卸载程序吗？'):
-            uninst_path = os.path.join(os.path.dirname(readConfig("Root")), 'uninst.exe')
+            uninst_path = os.path.join(os.path.dirname(readConfig('FileConfig.json', 'Root')), 'uninst.exe')
             subprocess.run(uninst_path, check=True)
             restartProgram()
     except Exception as e: messagebox.showerror('卸载程序', '卸载程序失败，请检查程序目录，或使用管理员身份运行程序！')
