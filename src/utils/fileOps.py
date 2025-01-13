@@ -1,48 +1,53 @@
-# 用于处理文件相关操作
-
-import os  # 导入系统库 处理文件路径
-from src.utils.Config import getFileConfig, setFileConfig  # 导入配置文件读写函数
-from tkinter import filedialog, messagebox  # 导入文件选择框和弹窗提示库
-from src.views.MainWin import setFilePath # 导入 UI 类
+import os
+from tkinter import filedialog, messagebox
+from src.utils.Config import updateConfig, readConfig
 
 
-# 分割文件路径和文件名
+# 处理文件路径
 def splitFilePath(filePath):
-    path, filename = os.path.split(filePath)  # 分割文件路径和文件名
-    setFileConfig("FileDirectory", path)  # 更新配置文件
-    setFileConfig("TextFileName", filename)  # 更新配置文件
-    setFileConfig("TextFilePath", filePath)  # 更新配置文件
-    setFilePath()  # 更新主窗口文件路径
+    if not filePath: return
+    path, filename = os.path.split(filePath)
+    name, _ = os.path.splitext(filename)
+    updateConfig("FileConfig.json", "CodeName", os.path.join(name))
+    updateConfig("FileConfig.json", "SourceCodePath", os.path.join(path))
 
 
-# 打开文件函数
+# 打开文件
 def openFile():
     try:
-        filePath = filedialog.askopenfilename(filetypes=[("*", "*.cn")]).replace('/', '\\') # 选择文件
-        if not filePath: return  # 未选择文件
-        splitFilePath(filePath)  # 分割文件路径和文件名
-    except: messagebox.showerror("错误", "打开文件失败！(2128)") # 弹窗提示错误信息
+        filePath = filedialog.askopenfilename(filetypes=[("CN Files", "*.cn")]).replace('/', '\\')
+        if not filePath: return
+        splitFilePath(filePath)
+    except Exception as e: messagebox.showerror("打开文件", "打开文件失败！")
 
 
-# 保存文件函数
+# 保存文件
 def saveFile(content):
     try:
-        with open(getFileConfig("TextFilePath"), "w", encoding="utf-8") as fileHandle: fileHandle.write(content)
-    except: messagebox.showerror("错误", "保存文件失败！(5814)") # 弹窗提示错误信息
+        filePath = os.path.join(readConfig("FileConfig.json", "SourceCodePath"), readConfig("FileConfig.json", "CodeName")) + ".cn"
+        with open(filePath, "w", encoding="utf-8") as fileHandle: fileHandle.write(content)
+    except Exception as e: messagebox.showerror("保存文件", "保存文件失败！")
 
 
-# 另存文件函数
+# 另存文件
 def saveAsFile(content):
     try:
-        filePath = filedialog.asksaveasfilename(filetypes=[("*", "*.cn")], defaultextension=".cn")  # 选择另存文件路径
-        if not filePath: return  # 未选择文件路径
-        with open(filePath, "w", encoding="utf-8") as fileHandle: fileHandle.write(content)  # 另存文件内容
-        splitFilePath(filePath)  # 分割文件路径和文件名
-    except: messagebox.showerror("错误", "另存文件失败！(5220)") # 弹窗提示错误信息
+        filePath = filedialog.asksaveasfilename(filetypes=[("CN Files", "*.cn")], defaultextension=".cn")
+        if not filePath: return
+        with open(filePath, "w", encoding="utf-8") as fileHandle: fileHandle.write(content)
+        splitFilePath(filePath)
+    except Exception as e: messagebox.showerror("另存文件", "另存文件失败！")
 
 
-# 获取文本代码
-def getText():
+# 读取文件内容
+def readFileContent():
     try:
-        with open(getFileConfig("TextFilePath"), "r", encoding="utf-8") as fileHandle: return fileHandle.read()  # 读取文本代码
-    except: messagebox.showerror("错误", "获取文本失败！(2049)") # 弹窗提示错误信息
+        filePath = readConfig("FileConfig.json", "SourceCodePath") + "\\" + readConfig("FileConfig.json", "CodeName") + ".cn"
+        if not os.path.exists(filePath):
+            updateConfig("FileConfig.json", "SourceCodePath", "")
+            updateConfig("FileConfig.json", "CodeName", "")
+            return None
+        with open(filePath, "r", encoding="utf-8") as fileHandle: return fileHandle.read()
+    except Exception as e:
+        messagebox.showerror("获取内容", "获取文件内容失败！")
+        return None

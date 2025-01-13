@@ -1,11 +1,12 @@
-import os # 导入os模块 处理文件路径
-from src.utils.Config import readConfig, writeConfig, getFileConfig # 导入配置文件读写函数
-from tkinter import messagebox # 弹窗库 显示提示信息
-from PyQt6.QtCore import pyqtSignal, QObject # 导入PyQt6模块的核心类
-from PyQt6 import QtCore, QtGui, QtWidgets  # 导入PyQt6模块的全部类
+from tkinter import messagebox
+from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtCore import pyqtSignal, QObject
+from src.utils.Config import readConfig, updateConfig
 
 
-class DialogSignals(QObject): dialogClosed = pyqtSignal(object) # 定义一个信号类
+# 定义一个信号类
+class DialogSignals(QObject): 
+    dialogClosed = pyqtSignal(object) 
 
 
 # 定义一个UI类
@@ -21,7 +22,7 @@ class Ui_Dialog(object):
 
         # 设置主窗口的图标
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(os.path.join(getFileConfig("Root") + r'\static', 'logo.ico')), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off) # 添加一个图像到图标对象中，使用"./Ui/logo.ico"路径下的图像，正常模式
+        icon.addPixmap(QtGui.QPixmap(readConfig("FileConfig.json", "ICON")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off) # 添加一个图像到图标对象中，使用"./Ui/logo.ico"路径下的图像，正常模式
         Dialog.setWindowIcon(icon) # 设置主窗口的图标
         
         # 创建垂直布局部件并设置其位置和大小
@@ -167,7 +168,7 @@ class Ui_Dialog(object):
 
         self.setSettings() # 设置设置值
 
-    # 重新翻译UI文本
+    # UI文本
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "设置"))
@@ -195,20 +196,20 @@ class Ui_Dialog(object):
                 "darkMode": self.checkBox_4.isChecked(),
                 "windowTop": self.checkBox_5.isChecked()
             }
-            writeConfig("personalConfig.json", settings) # 读取json文件并写入内容
+            updateConfig("PersonalConfig.json", settings) # 读取json文件并写入内容
             self.signals.dialogClosed.emit(settings) # 发送信号，通知主窗口关闭设置窗口
-        except: messagebox.showerror("错误", "设置失败！(6079)") # 弹出错误提示框
+        except: messagebox.showerror("设置样式", "设置样式配置文件失败！") # 弹出错误提示框
 
 
     # 读取json文件并设置设置值
     def setSettings(self):
         try:
-            settings = readConfig("personalConfig.json") # 读取json文件
+            settings = readConfig("PersonalConfig.json") # 读取json文件
 
             # 设置设置值
             self.spinBox_2.setValue(settings["fontSize"])
             self.checkBox_4.setChecked(settings["darkMode"])
             self.checkBox_3.setChecked(settings["highlightSyntax"])
             self.checkBox_5.setChecked(settings["windowTop"])
-        except: messagebox.showerror("错误", "设置失败！(4891)") # 弹出错误提示框
+        except: messagebox.showerror("读取样式", "读取样式配置文件失败！") # 弹出错误提示框
 

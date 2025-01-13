@@ -1,43 +1,18 @@
-# 当前编辑文件路径
-filePath = None
-def setFilePath(): 
-    global filePath
-    filePath = getFileConfig("TextFilePath")
-
-
-# 定义全局错误信息
-mistake = ""
-def setMistake(msg):
-    global mistake
-    if msg is None: mistake = ""
-    else: mistake = f'错误警告：{msg}'
-
-
-import os # 导入系统库 处理文件路径
-from tkinter import messagebox  # 导入messagebox库 弹出提示框
-import keyboard  # 导入keyboard库 处理键盘事件
-from src.utils.SetPage import resetProgram, uninstallProgram  # 导入设置程序模块
-from src.utils.Config import getFileConfig, readConfig  # 导入处理配置文件模块
-from src.views.SetWin import Ui_Dialog, DialogSignals  # 导入设置窗口 UI 模块
-from src.utils.SyntaxHigh import ChineseHighlighter # 导入语法高亮模块
-from src.utils.FileOps import openFile, saveFile, saveAsFile, getText # 导入操作文件模块
-from src.utils.CodeProc import runCode, compileCode  # 导入处理代码模块
-from PyQt6 import QtCore, QtGui, QtWidgets # 导入PyQt6库 处理GUI界面
-
-
-# 定义变量
-def init():
-    setFilePath() # 设置当前编辑文件路径
-    currentDir = getFileConfig("Root") # 获取当前文件的目录
-    iconPath = os.path.join(currentDir, 'static', 'logo.ico') # 图标路径
-    personalConfigPath = currentDir + r'\config\personalConfig.json' # 样式配置文件路径
-    return iconPath, personalConfigPath # 返回图标路径和样式配置文件路径
+import os
+import keyboard
+from tkinter import messagebox
+from PyQt6 import QtCore, QtGui, QtWidgets 
+from src.utils.SyntaxHigh import ChineseHighlighter 
+from src.utils.CodeProc import runCode, compileCode 
+from src.utils.Config import readConfig
+from src.views.SetWin import Ui_Dialog, DialogSignals
+from src.utils.SetPage import resetProgram, uninstallProgram
+from src.utils.FileOps import openFile, readFileContent, saveFile, saveAsFile, splitFilePath
 
 
 # 定义主窗口类
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        iconPath, personalConfigPath = init() # 初始化全局变量
         MainWindow.setObjectName("MainWindow") # 设置主窗口的对象名
         MainWindow.resize(1500, 900) # 设置主窗口的初始大小为 800x600
 
@@ -48,9 +23,9 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())  # 根据高度是否可以基于宽度进行调整
         MainWindow.setSizePolicy(sizePolicy)  # 设置主窗口的大小策略
 
-        # 创建一个图标对象``
+        # 创建一个图标对象
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(iconPath), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off) # 添加一个图像到图标对象中，使用"./Ui/logo.ico"路径下的图像，正常模式
+        icon.addPixmap(QtGui.QPixmap(readConfig("FileConfig.json", "ICON")), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off) # 添加一个图像到图标对象中，使用"./Ui/logo.ico"路径下的图像，正常模式
         MainWindow.setWindowIcon(icon) # 设置主窗口的图标
 
         # 将Ui_Dialog其设为MainWindow的子部件
@@ -82,6 +57,7 @@ class Ui_MainWindow(object):
         self.statusLabel.setText("Ready")  # 设置初始文本
         self.statusbar.addPermanentWidget(self.statusLabel)  # 添加到状态栏的永久部件区域
         MainWindow.setStatusBar(self.statusbar) # 设置MainWindow的状态栏为self.statusbar
+
         
         # 创建一个多行文本编辑框，作为self.horizontalLayoutWidget的子部件
         self.plainTextEdit = QtWidgets.QPlainTextEdit(parent=self.horizontalLayoutWidget)
@@ -102,11 +78,11 @@ class Ui_MainWindow(object):
         self.iniStyle = iniStyle # 将iniStyle函数设为self.iniStyle
 
         # 读取配置文件
-        if os.path.exists(personalConfigPath): 
+        if readConfig("PersonalConfig.json"): 
             try:
-                settings = readConfig("personalConfig.json")
+                settings = readConfig("PersonalConfig.json")
                 iniStyle(settings['fontSize'], settings['darkMode'], settings['highlightSyntax'], settings['windowTop'])
-            except: messagebox.showerror("错误", "配置文件读取失败，请检查配置文件内容。(5604)")
+            except: messagebox.showerror("样式配置", "配置样式文件读取失败，请检查配置文件内容。")
         else: iniStyle()
         
         self.plainTextEdit.setTabChangesFocus(True) # 设置按下Tab键时切换焦点
@@ -213,10 +189,10 @@ class Ui_MainWindow(object):
         cursorBlock = self.plainTextEdit.document().findBlock(cursorPosition)
         cursorLineNumber = cursorBlock.blockNumber() + 1  # 行号从0开始，+1转换为从1开始
 
-        self.statusLabel.setText(f"行号: {cursorLineNumber}     {mistake}     文件：{filePath}     版本：v1.0.1") # 修改状态栏的文本
+        self.statusLabel.setText(f"行号: {cursorLineNumber}    文件：{readConfig('FileConfig.json', 'SourceCodePath')}/{readConfig('FileConfig.json', 'CodeName')}.cn     版本: v2.0.0") # 修改状态栏的文本
 
 
-    # 定义界面翻译函数
+    # 定义界面
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate  # 定义一个翻译函数
         MainWindow.setWindowTitle(_translate("MainWindow", "熊猫编辑器"))  # 设置主窗口的标题
@@ -242,9 +218,10 @@ class Ui_MainWindow(object):
         self.action_13.setText(_translate("MainWindow", "卸载程序  Ctrl+Shift+U"))
         self.action_14.setText(_translate("MainWindow", "重置程序  Ctrl+Shift+R"))
 
+        if readConfig("FileConfig.json", "SourceCodePath") != "": self.plainTextEdit.setPlainText(readFileContent())
+
         # 绑定信号和槽，关联菜单项的点击事件和功能实现
-        self.plainTextEdit.setPlainText(getText()) # 显示默认代码
-        self.action.triggered.connect(lambda: (openFile(), self.plainTextEdit.setPlainText(getText()))) # 绑定打开文件操作
+        self.action.triggered.connect(lambda: (openFile(), self.plainTextEdit.setPlainText(readFileContent()))) # 绑定打开文件操作
         self.action_2.triggered.connect(lambda: saveFile(self.plainTextEdit.toPlainText()))  # 绑定保存文件操作
         self.action_3.triggered.connect(lambda: saveAsFile(self.plainTextEdit.toPlainText()))  # 绑定另存文件操作
         self.action_4.triggered.connect(lambda: (runCode(self.plainTextEdit.toPlainText()), saveFile(self.plainTextEdit.toPlainText())))  # 绑定运行代码操作
@@ -257,8 +234,8 @@ class Ui_MainWindow(object):
         self.action_12.triggered.connect(lambda: os.startfile('https://cxfjh.github.io/PandaEditorHub/'))  # 绑定更新程序操作
         self.action_8.triggered.connect(lambda: os.startfile('https://github.com/cxfjh/PandaEditor/blob/main/docs/USAGE.md'))  # 绑定使用教程操作
 
-        # # 快捷键设置
-        keyboard.add_hotkey('Ctrl+O', lambda: (openFile(), self.plainTextEdit.setPlainText(getText())))  # 绑定Ctrl+O快捷键打开文件
+        # 快捷键设置
+        keyboard.add_hotkey('Ctrl+O', lambda: (openFile(), self.plainTextEdit.setPlainText(readFileContent())))  # 绑定Ctrl+O快捷键打开文件
         keyboard.add_hotkey('ctrl+S', lambda: saveFile(self.plainTextEdit.toPlainText()))  # 绑定Ctrl+S快捷键保存文件
         keyboard.add_hotkey('Ctrl+Shift+S', lambda: saveAsFile(self.plainTextEdit.toPlainText()))  # 绑定Ctrl+Shift+S快捷键另存文件
         keyboard.add_hotkey('Ctrl+R', lambda: (runCode(self.plainTextEdit.toPlainText()), saveFile(self.plainTextEdit.toPlainText())))  # 绑定Ctrl+R快捷键运行代码

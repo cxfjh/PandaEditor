@@ -19,3 +19,12 @@
 - 优化了目录结构，使得代码更易读
 - [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v1.0.2)
 - [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
+
+
+## 版本 2 更新
+
+### v2.0.0
+#### 2025年01月13日
+- 发布第二个版本
+- [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v2.0.0)
+- [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
