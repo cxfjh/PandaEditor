@@ -28,3 +28,9 @@
 - 发布第二个版本
 - [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v2.0.0)
 - [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
+
+### v2.0.1
+#### 2025年02月26日
+- 发布第二个版本
+- [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v2.0.1)
+- [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
