@@ -189,7 +189,7 @@ class Ui_MainWindow(object):
         cursorBlock = self.plainTextEdit.document().findBlock(cursorPosition)
         cursorLineNumber = cursorBlock.blockNumber() + 1  # 行号从0开始，+1转换为从1开始
 
-        self.statusLabel.setText(f"行号: {cursorLineNumber}    文件：{readConfig('FileConfig.json', 'SourceCodePath')}/{readConfig('FileConfig.json', 'CodeName')}.cn     版本: v2.0.0") # 修改状态栏的文本
+        self.statusLabel.setText(f"行号: {cursorLineNumber}    文件：{readConfig('FileConfig.json', 'SourceCodePath')}/{readConfig('FileConfig.json', 'CodeName')}.cn     版本: v2.0.1") # 修改状态栏的文本
 
 
     # 定义界面
