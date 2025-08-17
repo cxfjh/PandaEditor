@@ -24,8 +24,10 @@ def prepend_path_to_environment_variable(path, variable_name):
     """
     stored_paths = os.environ.get(variable_name)
     if stored_paths:
-        # If path is already included, make this a no-op.
-        if path in stored_paths:
+        # If path is already included, make this a no-op. NOTE: we need to split the string and search in the list of
+        # substrings to find an exact match; searching in the original string might erroneously match a prefix of a
+        # longer (i.e., sub-directory) path when such entry already happens to be in PATH (see #8857).
+        if path in stored_paths.split(os.pathsep):
             return
         # Otherwise, prepend the path
         stored_paths = path + os.pathsep + stored_paths

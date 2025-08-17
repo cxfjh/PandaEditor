@@ -1,30 +1,24 @@
 # 熊猫编辑器 更新日志
 
-## 版本 1 更新
+## 版本 0 更新
 
-### v1.0.0
-#### 2024年8月17日
+### v0.1.0
+#### 2025年8月17日
 - 发布第一个版本
-- [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v1.0.0)
+- [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v0.1.0)
 - [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
+  
+### 新增
+- 无
 
-### v1.0.1
-#### 2024年8月26日
-- 修复了字符串中的关键字被替换问题
-- [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v1.0.1)
-- [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
+### 更改
+- 无
 
-### v1.0.2
-#### 2024年11月09日
-- 优化了目录结构，使得代码更易读
-- [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v1.0.2)
-- [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
+### 修复
+- 无
 
+### 已知问题
+- 无
 
-## 版本 2 更新
-
-### v2.0.0
-#### 2025年01月13日
-- 发布第二个版本
-- [Github 下载](https://github.com/cxfjh/PandaEditor/releases/tag/v2.0.0)
-- [123云盘下载](https://www.123pan.com/s/IzrNjv-cAd7A)
+### 贡献者
+- 感谢所有为这个版本做出贡献的开发者。

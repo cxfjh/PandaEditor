@@ -51,6 +51,8 @@ if typing.TYPE_CHECKING:
         PydanticDeprecatedSince20,
         PydanticDeprecatedSince26,
         PydanticDeprecatedSince29,
+        PydanticDeprecatedSince210,
+        PydanticDeprecatedSince211,
         PydanticDeprecationWarning,
         PydanticExperimentalWarning,
     )
@@ -102,6 +104,7 @@ __all__ = (
     'PydanticImportError',
     'PydanticUndefinedAnnotation',
     'PydanticInvalidForJsonSchema',
+    'PydanticForbiddenQualifier',
     # fields
     'Field',
     'computed_field',
@@ -172,6 +175,9 @@ __all__ = (
     'UUID3',
     'UUID4',
     'UUID5',
+    'UUID6',
+    'UUID7',
+    'UUID8',
     'FilePath',
     'DirectoryPath',
     'NewPath',
@@ -215,6 +221,8 @@ __all__ = (
     'PydanticDeprecatedSince20',
     'PydanticDeprecatedSince26',
     'PydanticDeprecatedSince29',
+    'PydanticDeprecatedSince210',
+    'PydanticDeprecatedSince211',
     'PydanticDeprecationWarning',
     'PydanticExperimentalWarning',
     # annotated handlers
@@ -263,6 +271,7 @@ _dynamic_imports: 'dict[str, tuple[str, str]]' = {
     'PydanticImportError': (__spec__.parent, '.errors'),
     'PydanticUndefinedAnnotation': (__spec__.parent, '.errors'),
     'PydanticInvalidForJsonSchema': (__spec__.parent, '.errors'),
+    'PydanticForbiddenQualifier': (__spec__.parent, '.errors'),
     # fields
     'Field': (__spec__.parent, '.fields'),
     'computed_field': (__spec__.parent, '.fields'),
@@ -329,6 +338,9 @@ _dynamic_imports: 'dict[str, tuple[str, str]]' = {
     'UUID3': (__spec__.parent, '.types'),
     'UUID4': (__spec__.parent, '.types'),
     'UUID5': (__spec__.parent, '.types'),
+    'UUID6': (__spec__.parent, '.types'),
+    'UUID7': (__spec__.parent, '.types'),
+    'UUID8': (__spec__.parent, '.types'),
     'FilePath': (__spec__.parent, '.types'),
     'DirectoryPath': (__spec__.parent, '.types'),
     'NewPath': (__spec__.parent, '.types'),
@@ -370,6 +382,8 @@ _dynamic_imports: 'dict[str, tuple[str, str]]' = {
     'PydanticDeprecatedSince20': (__spec__.parent, '.warnings'),
     'PydanticDeprecatedSince26': (__spec__.parent, '.warnings'),
     'PydanticDeprecatedSince29': (__spec__.parent, '.warnings'),
+    'PydanticDeprecatedSince210': (__spec__.parent, '.warnings'),
+    'PydanticDeprecatedSince211': (__spec__.parent, '.warnings'),
     'PydanticDeprecationWarning': (__spec__.parent, '.warnings'),
     'PydanticExperimentalWarning': (__spec__.parent, '.warnings'),
     # annotated handlers

@@ -9,10 +9,10 @@
 
 """Tests specific to all BSD platforms."""
 
-
 import datetime
 import os
 import re
+import shutil
 import time
 
 import psutil
@@ -28,7 +28,6 @@ from psutil.tests import retry_on_failure
 from psutil.tests import sh
 from psutil.tests import spawn_testproc
 from psutil.tests import terminate
-from psutil.tests import which
 
 
 if BSD:
@@ -36,7 +35,7 @@ if BSD:
 
     PAGESIZE = getpagesize()
     # muse requires root privileges
-    MUSE_AVAILABLE = os.getuid() == 0 and which('muse')
+    MUSE_AVAILABLE = os.getuid() == 0 and shutil.which("muse")
 else:
     PAGESIZE = None
     MUSE_AVAILABLE = False
@@ -87,7 +86,7 @@ class BSDTestCase(PsutilTestCase):
 
     @pytest.mark.skipif(NETBSD, reason="-o lstart doesn't work on NETBSD")
     def test_process_create_time(self):
-        output = sh("ps -o lstart -p %s" % self.pid)
+        output = sh(f"ps -o lstart -p {self.pid}")
         start_ps = output.replace('STARTED', '').strip()
         start_psutil = psutil.Process(self.pid).create_time()
         start_psutil = time.strftime(
@@ -99,7 +98,7 @@ class BSDTestCase(PsutilTestCase):
         # test psutil.disk_usage() and psutil.disk_partitions()
         # against "df -a"
         def df(path):
-            out = sh('df -k "%s"' % path).strip()
+            out = sh(f'df -k "{path}"').strip()
             lines = out.split('\n')
             lines.pop(0)
             line = lines.pop(0)
@@ -118,16 +117,20 @@ class BSDTestCase(PsutilTestCase):
             assert usage.total == total
             # 10 MB tolerance
             if abs(usage.free - free) > 10 * 1024 * 1024:
-                raise self.fail("psutil=%s, df=%s" % (usage.free, free))
+                raise self.fail(f"psutil={usage.free}, df={free}")
             if abs(usage.used - used) > 10 * 1024 * 1024:
-                raise self.fail("psutil=%s, df=%s" % (usage.used, used))
+                raise self.fail(f"psutil={usage.used}, df={used}")
 
-    @pytest.mark.skipif(not which('sysctl'), reason="sysctl cmd not available")
+    @pytest.mark.skipif(
+        not shutil.which("sysctl"), reason="sysctl cmd not available"
+    )
     def test_cpu_count_logical(self):
         syst = sysctl("hw.ncpu")
         assert psutil.cpu_count(logical=True) == syst
 
-    @pytest.mark.skipif(not which('sysctl'), reason="sysctl cmd not available")
+    @pytest.mark.skipif(
+        not shutil.which("sysctl"), reason="sysctl cmd not available"
+    )
     @pytest.mark.skipif(
         NETBSD, reason="skipped on NETBSD"  # we check /proc/meminfo
     )
@@ -136,12 +139,12 @@ class BSDTestCase(PsutilTestCase):
         assert num == psutil.virtual_memory().total
 
     @pytest.mark.skipif(
-        not which('ifconfig'), reason="ifconfig cmd not available"
+        not shutil.which("ifconfig"), reason="ifconfig cmd not available"
     )
     def test_net_if_stats(self):
         for name, stats in psutil.net_if_stats().items():
             try:
-                out = sh("ifconfig %s" % name)
+                out = sh(f"ifconfig {name}")
             except RuntimeError:
                 pass
             else:
@@ -167,7 +170,7 @@ class FreeBSDPsutilTestCase(PsutilTestCase):
 
     @retry_on_failure()
     def test_memory_maps(self):
-        out = sh('procstat -v %s' % self.pid)
+        out = sh(f"procstat -v {self.pid}")
         maps = psutil.Process(self.pid).memory_maps(grouped=False)
         lines = out.split('\n')[1:]
         while lines:
@@ -175,23 +178,23 @@ class FreeBSDPsutilTestCase(PsutilTestCase):
             fields = line.split()
             _, start, stop, _perms, res = fields[:5]
             map = maps.pop()
-            assert "%s-%s" % (start, stop) == map.addr
+            assert f"{start}-{stop}" == map.addr
             assert int(res) == map.rss
             if not map.path.startswith('['):
                 assert fields[10] == map.path
 
     def test_exe(self):
-        out = sh('procstat -b %s' % self.pid)
+        out = sh(f"procstat -b {self.pid}")
         assert psutil.Process(self.pid).exe() == out.split('\n')[1].split()[-1]
 
     def test_cmdline(self):
-        out = sh('procstat -c %s' % self.pid)
+        out = sh(f"procstat -c {self.pid}")
         assert ' '.join(psutil.Process(self.pid).cmdline()) == ' '.join(
             out.split('\n')[1].split()[2:]
         )
 
     def test_uids_gids(self):
-        out = sh('procstat -s %s' % self.pid)
+        out = sh(f"procstat -s {self.pid}")
         euid, ruid, suid, egid, rgid, sgid = out.split('\n')[1].split()[2:8]
         p = psutil.Process(self.pid)
         uids = p.uids()
@@ -206,7 +209,7 @@ class FreeBSDPsutilTestCase(PsutilTestCase):
     @retry_on_failure()
     def test_ctx_switches(self):
         tested = []
-        out = sh('procstat -r %s' % self.pid)
+        out = sh(f"procstat -r {self.pid}")
         p = psutil.Process(self.pid)
         for line in out.split('\n'):
             line = line.lower().strip()
@@ -226,7 +229,7 @@ class FreeBSDPsutilTestCase(PsutilTestCase):
     @retry_on_failure()
     def test_cpu_times(self):
         tested = []
-        out = sh('procstat -r %s' % self.pid)
+        out = sh(f"procstat -r {self.pid}")
         p = psutil.Process(self.pid)
         for line in out.split('\n'):
             line = line.lower().strip()
@@ -253,7 +256,7 @@ class FreeBSDSystemTestCase(PsutilTestCase):
         parts = re.split(r'\s+', output)
 
         if not parts:
-            raise ValueError("Can't parse swapinfo: %s" % output)
+            raise ValueError(f"Can't parse swapinfo: {output}")
 
         # the size is in 1k units, so multiply by 1024
         total, used, free = (int(p) * 1024 for p in parts[1:4])
@@ -420,12 +423,10 @@ class FreeBSDSystemTestCase(PsutilTestCase):
         def secs2hours(secs):
             m, _s = divmod(secs, 60)
             h, m = divmod(m, 60)
-            return "%d:%02d" % (h, m)
+            return f"{int(h)}:{int(m):02}"
 
         out = sh("acpiconf -i 0")
-        fields = dict(
-            [(x.split('\t')[0], x.split('\t')[-1]) for x in out.split("\n")]
-        )
+        fields = {x.split('\t')[0]: x.split('\t')[-1] for x in out.split("\n")}
         metrics = psutil.sensors_battery()
         percent = int(fields['Remaining capacity:'].replace('%', ''))
         remaining_time = fields['Remaining time:']
@@ -465,7 +466,7 @@ class FreeBSDSystemTestCase(PsutilTestCase):
     def test_sensors_temperatures_against_sysctl(self):
         num_cpus = psutil.cpu_count(True)
         for cpu in range(num_cpus):
-            sensor = "dev.cpu.%s.temperature" % cpu
+            sensor = f"dev.cpu.{cpu}.temperature"
             # sysctl returns a string in the format 46.0C
             try:
                 sysctl_result = int(float(sysctl(sensor)[:-1]))
@@ -479,7 +480,7 @@ class FreeBSDSystemTestCase(PsutilTestCase):
                 < 10
             )
 
-            sensor = "dev.cpu.%s.coretemp.tjmax" % cpu
+            sensor = f"dev.cpu.{cpu}.coretemp.tjmax"
             sysctl_result = int(float(sysctl(sensor)[:-1]))
             assert (
                 psutil.sensors_temperatures()["coretemp"][cpu].high
@@ -514,7 +515,7 @@ class NetBSDTestCase(PsutilTestCase):
             for line in f:
                 if line.startswith(look_for):
                     return int(line.split()[1]) * 1024
-        raise ValueError("can't find %s" % look_for)
+        raise ValueError(f"can't find {look_for}")
 
     # --- virtual mem
 

@@ -8,12 +8,18 @@ from dataclasses import fields
 from functools import lru_cache
 from importlib.metadata import version
 from ipaddress import IPv4Address, IPv4Interface, IPv4Network, IPv6Address, IPv6Interface, IPv6Network
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar
 
-from pydantic_core import MultiHostHost, PydanticCustomError, SchemaSerializer, core_schema
+from pydantic_core import (
+    MultiHostHost,
+    PydanticCustomError,
+    PydanticSerializationUnexpectedValue,
+    SchemaSerializer,
+    core_schema,
+)
 from pydantic_core import MultiHostUrl as _CoreMultiHostUrl
 from pydantic_core import Url as _CoreUrl
-from typing_extensions import Annotated, Self, TypeAlias
+from typing_extensions import Self, TypeAlias
 
 from pydantic.errors import PydanticUserError
 
@@ -211,6 +217,13 @@ class _BaseUrl:
         """
         return self._url.unicode_string()
 
+    def encoded_string(self) -> str:
+        """The URL's encoded string representation via __str__().
+
+        This returns the punycode-encoded host version of the URL as a string.
+        """
+        return str(self)
+
     def __str__(self) -> str:
         """The URL as a string, this will punycode encode the host if required."""
         return str(self._url)
@@ -284,6 +297,16 @@ class _BaseUrl:
         )
 
     @classmethod
+    def serialize_url(cls, url: Any, info: core_schema.SerializationInfo) -> str | Self:
+        if not isinstance(url, cls):
+            raise PydanticSerializationUnexpectedValue(
+                f"Expected `{cls}` but got `{type(url)}` with value `'{url}'` - serialized value may not be as expected."
+            )
+        if info.mode == 'json':
+            return str(url)
+        return url
+
+    @classmethod
     def __get_pydantic_core_schema__(
         cls, source: type[_BaseUrl], handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
@@ -300,7 +323,9 @@ class _BaseUrl:
         return core_schema.no_info_wrap_validator_function(
             wrap_val,
             schema=core_schema.url_schema(**cls._constraints.defined_constraints),
-            serialization=core_schema.to_string_ser_schema(),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                cls.serialize_url, info_arg=True, when_used='always'
+            ),
         )
 
     @classmethod
@@ -349,7 +374,7 @@ class _BaseMultiHostUrl:
     def query_params(self) -> list[tuple[str, str]]:
         """The query part of the URL as a list of key-value pairs.
 
-        e.g. `[('foo', 'bar')]` in `https://foo.com,bar.com/path?query#fragment`
+        e.g. `[('foo', 'bar')]` in `https://foo.com,bar.com/path?foo=bar#fragment`
         """
         return self._url.query_params()
 
@@ -379,6 +404,13 @@ class _BaseMultiHostUrl:
             A list of dicts, each representing a host.
         '''
         return self._url.hosts()
+
+    def encoded_string(self) -> str:
+        """The URL's encoded string representation via __str__().
+
+        This returns the punycode-encoded host version of the URL as a string.
+        """
+        return str(self)
 
     def unicode_string(self) -> str:
         """The URL as a unicode string, unlike `__str__()` this will not punycode encode the hosts."""
@@ -451,6 +483,16 @@ class _BaseMultiHostUrl:
         )
 
     @classmethod
+    def serialize_url(cls, url: Any, info: core_schema.SerializationInfo) -> str | Self:
+        if not isinstance(url, cls):
+            raise PydanticSerializationUnexpectedValue(
+                f"Expected `{cls}` but got `{type(url)}` with value `'{url}'` - serialized value may not be as expected."
+            )
+        if info.mode == 'json':
+            return str(url)
+        return url
+
+    @classmethod
     def __get_pydantic_core_schema__(
         cls, source: type[_BaseMultiHostUrl], handler: GetCoreSchemaHandler
     ) -> core_schema.CoreSchema:
@@ -467,7 +509,9 @@ class _BaseMultiHostUrl:
         return core_schema.no_info_wrap_validator_function(
             wrap_val,
             schema=core_schema.multi_host_url_schema(**cls._constraints.defined_constraints),
-            serialization=core_schema.to_string_ser_schema(),
+            serialization=core_schema.plain_serializer_function_ser_schema(
+                cls.serialize_url, info_arg=True, when_used='always'
+            ),
         )
 
     @classmethod
@@ -864,7 +908,14 @@ class ClickHouseDsn(AnyUrl):
     """
 
     _constraints = UrlConstraints(
-        allowed_schemes=['clickhouse+native', 'clickhouse+asynch'],
+        allowed_schemes=[
+            'clickhouse+native',
+            'clickhouse+asynch',
+            'clickhouse+http',
+            'clickhouse',
+            'clickhouses',
+            'clickhousedb',
+        ],
         default_host='localhost',
         default_port=9000,
     )

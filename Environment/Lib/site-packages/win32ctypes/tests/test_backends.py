@@ -22,6 +22,8 @@ class TestBackends(unittest.TestCase):
         # when/then
         for name in _modules:
             module = importlib.import_module(f'win32ctypes.core.{name}')
+            self.assertEqual(
+                module.__spec__.name, f'win32ctypes.core.{name}')
             self.assertTrue(module.__file__.endswith(f'cffi\\{name}.py'))
 
     @unittest.skipIf(_backend != 'ctypes', 'ctypes backend not enabled')
@@ -29,4 +31,6 @@ class TestBackends(unittest.TestCase):
         # when/then
         for name in _modules:
             module = importlib.import_module(f'win32ctypes.core.{name}')
+            self.assertEqual(
+                module.__spec__.name, f'win32ctypes.core.{name}')
             self.assertTrue(module.__file__.endswith(f'ctypes\\{name}.py'))

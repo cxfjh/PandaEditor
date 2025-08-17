@@ -3,12 +3,12 @@
 from __future__ import annotations as _annotations
 
 import sys
+from collections.abc import Callable, Iterable
 from dataclasses import is_dataclass
 from types import FrameType
 from typing import (
     Any,
     Generic,
-    Iterable,
     Literal,
     TypeVar,
     cast,
@@ -67,7 +67,8 @@ def _type_has_config(type_: Any) -> bool:
 
 @final
 class TypeAdapter(Generic[T]):
-    """Usage docs: https://docs.pydantic.dev/2.10/concepts/type_adapter/
+    """!!! abstract "Usage Documentation"
+        [`TypeAdapter`](../concepts/type_adapter.md)
 
     Type adapters provide a flexible way to perform validation and serialization based on a Python type.
 
@@ -136,10 +137,8 @@ class TypeAdapter(Generic[T]):
         For example, take the following:
 
         ```python {title="a.py"}
-        from typing import Dict, List
-
-        IntList = List[int]
-        OuterDict = Dict[str, 'IntList']
+        IntList = list[int]
+        OuterDict = dict[str, 'IntList']
         ```
 
         ```python {test="skip" title="b.py"}
@@ -263,7 +262,7 @@ class TypeAdapter(Generic[T]):
                 and `raise_errors=True`.
         """
         if not force and self._defer_build:
-            _mock_val_ser.set_type_adapter_mocks(self, str(self._type))
+            _mock_val_ser.set_type_adapter_mocks(self)
             self.pydantic_complete = False
             return False
 
@@ -291,13 +290,13 @@ class TypeAdapter(Generic[T]):
             except PydanticUndefinedAnnotation:
                 if raise_errors:
                     raise
-                _mock_val_ser.set_type_adapter_mocks(self, str(self._type))
+                _mock_val_ser.set_type_adapter_mocks(self)
                 return False
 
             try:
                 self.core_schema = schema_generator.clean_schema(core_schema)
-            except schema_generator.CollectedInvalid:
-                _mock_val_ser.set_type_adapter_mocks(self, str(self._type))
+            except _generate_schema.InvalidSchemaError:
+                _mock_val_ser.set_type_adapter_mocks(self)
                 return False
 
             core_config = config_wrapper.core_config(None)
@@ -388,6 +387,8 @@ class TypeAdapter(Generic[T]):
         from_attributes: bool | None = None,
         context: dict[str, Any] | None = None,
         experimental_allow_partial: bool | Literal['off', 'on', 'trailing-strings'] = False,
+        by_alias: bool | None = None,
+        by_name: bool | None = None,
     ) -> T:
         """Validate a Python object against the model.
 
@@ -401,6 +402,8 @@ class TypeAdapter(Generic[T]):
                 * False / 'off': Default behavior, no partial validation.
                 * True / 'on': Enable partial validation.
                 * 'trailing-strings': Enable partial validation and allow trailing strings in the input.
+            by_alias: Whether to use the field's alias when validating against the provided input data.
+            by_name: Whether to use the field's name when validating against the provided input data.
 
         !!! note
             When using `TypeAdapter` with a Pydantic `dataclass`, the use of the `from_attributes`
@@ -409,12 +412,20 @@ class TypeAdapter(Generic[T]):
         Returns:
             The validated object.
         """
+        if by_alias is False and by_name is not True:
+            raise PydanticUserError(
+                'At least one of `by_alias` or `by_name` must be set to True.',
+                code='validate-by-alias-and-name-false',
+            )
+
         return self.validator.validate_python(
             object,
             strict=strict,
             from_attributes=from_attributes,
             context=context,
             allow_partial=experimental_allow_partial,
+            by_alias=by_alias,
+            by_name=by_name,
         )
 
     def validate_json(
@@ -425,8 +436,11 @@ class TypeAdapter(Generic[T]):
         strict: bool | None = None,
         context: dict[str, Any] | None = None,
         experimental_allow_partial: bool | Literal['off', 'on', 'trailing-strings'] = False,
+        by_alias: bool | None = None,
+        by_name: bool | None = None,
     ) -> T:
-        """Usage docs: https://docs.pydantic.dev/2.10/concepts/json/#json-parsing
+        """!!! abstract "Usage Documentation"
+            [JSON Parsing](../concepts/json.md#json-parsing)
 
         Validate a JSON string or bytes against the model.
 
@@ -439,12 +453,25 @@ class TypeAdapter(Generic[T]):
                 * False / 'off': Default behavior, no partial validation.
                 * True / 'on': Enable partial validation.
                 * 'trailing-strings': Enable partial validation and allow trailing strings in the input.
+            by_alias: Whether to use the field's alias when validating against the provided input data.
+            by_name: Whether to use the field's name when validating against the provided input data.
 
         Returns:
             The validated object.
         """
+        if by_alias is False and by_name is not True:
+            raise PydanticUserError(
+                'At least one of `by_alias` or `by_name` must be set to True.',
+                code='validate-by-alias-and-name-false',
+            )
+
         return self.validator.validate_json(
-            data, strict=strict, context=context, allow_partial=experimental_allow_partial
+            data,
+            strict=strict,
+            context=context,
+            allow_partial=experimental_allow_partial,
+            by_alias=by_alias,
+            by_name=by_name,
         )
 
     def validate_strings(
@@ -455,6 +482,8 @@ class TypeAdapter(Generic[T]):
         strict: bool | None = None,
         context: dict[str, Any] | None = None,
         experimental_allow_partial: bool | Literal['off', 'on', 'trailing-strings'] = False,
+        by_alias: bool | None = None,
+        by_name: bool | None = None,
     ) -> T:
         """Validate object contains string data against the model.
 
@@ -467,12 +496,25 @@ class TypeAdapter(Generic[T]):
                 * False / 'off': Default behavior, no partial validation.
                 * True / 'on': Enable partial validation.
                 * 'trailing-strings': Enable partial validation and allow trailing strings in the input.
+            by_alias: Whether to use the field's alias when validating against the provided input data.
+            by_name: Whether to use the field's name when validating against the provided input data.
 
         Returns:
             The validated object.
         """
+        if by_alias is False and by_name is not True:
+            raise PydanticUserError(
+                'At least one of `by_alias` or `by_name` must be set to True.',
+                code='validate-by-alias-and-name-false',
+            )
+
         return self.validator.validate_strings(
-            obj, strict=strict, context=context, allow_partial=experimental_allow_partial
+            obj,
+            strict=strict,
+            context=context,
+            allow_partial=experimental_allow_partial,
+            by_alias=by_alias,
+            by_name=by_name,
         )
 
     def get_default_value(self, *, strict: bool | None = None, context: dict[str, Any] | None = None) -> Some[T] | None:
@@ -495,12 +537,13 @@ class TypeAdapter(Generic[T]):
         mode: Literal['json', 'python'] = 'python',
         include: IncEx | None = None,
         exclude: IncEx | None = None,
-        by_alias: bool = False,
+        by_alias: bool | None = None,
         exclude_unset: bool = False,
         exclude_defaults: bool = False,
         exclude_none: bool = False,
         round_trip: bool = False,
         warnings: bool | Literal['none', 'warn', 'error'] = True,
+        fallback: Callable[[Any], Any] | None = None,
         serialize_as_any: bool = False,
         context: dict[str, Any] | None = None,
     ) -> Any:
@@ -518,6 +561,8 @@ class TypeAdapter(Generic[T]):
             round_trip: Whether to output the serialized data in a way that is compatible with deserialization.
             warnings: How to handle serialization errors. False/"none" ignores them, True/"warn" logs errors,
                 "error" raises a [`PydanticSerializationError`][pydantic_core.PydanticSerializationError].
+            fallback: A function to call when an unknown value is encountered. If not provided,
+                a [`PydanticSerializationError`][pydantic_core.PydanticSerializationError] error is raised.
             serialize_as_any: Whether to serialize fields with duck-typing serialization behavior.
             context: Additional context to pass to the serializer.
 
@@ -535,6 +580,7 @@ class TypeAdapter(Generic[T]):
             exclude_none=exclude_none,
             round_trip=round_trip,
             warnings=warnings,
+            fallback=fallback,
             serialize_as_any=serialize_as_any,
             context=context,
         )
@@ -547,16 +593,18 @@ class TypeAdapter(Generic[T]):
         indent: int | None = None,
         include: IncEx | None = None,
         exclude: IncEx | None = None,
-        by_alias: bool = False,
+        by_alias: bool | None = None,
         exclude_unset: bool = False,
         exclude_defaults: bool = False,
         exclude_none: bool = False,
         round_trip: bool = False,
         warnings: bool | Literal['none', 'warn', 'error'] = True,
+        fallback: Callable[[Any], Any] | None = None,
         serialize_as_any: bool = False,
         context: dict[str, Any] | None = None,
     ) -> bytes:
-        """Usage docs: https://docs.pydantic.dev/2.10/concepts/json/#json-serialization
+        """!!! abstract "Usage Documentation"
+            [JSON Serialization](../concepts/json.md#json-serialization)
 
         Serialize an instance of the adapted type to JSON.
 
@@ -572,6 +620,8 @@ class TypeAdapter(Generic[T]):
             round_trip: Whether to serialize and deserialize the instance to ensure round-tripping.
             warnings: How to handle serialization errors. False/"none" ignores them, True/"warn" logs errors,
                 "error" raises a [`PydanticSerializationError`][pydantic_core.PydanticSerializationError].
+            fallback: A function to call when an unknown value is encountered. If not provided,
+                a [`PydanticSerializationError`][pydantic_core.PydanticSerializationError] error is raised.
             serialize_as_any: Whether to serialize fields with duck-typing serialization behavior.
             context: Additional context to pass to the serializer.
 
@@ -589,6 +639,7 @@ class TypeAdapter(Generic[T]):
             exclude_none=exclude_none,
             round_trip=round_trip,
             warnings=warnings,
+            fallback=fallback,
             serialize_as_any=serialize_as_any,
             context=context,
         )
@@ -658,9 +709,9 @@ class TypeAdapter(Generic[T]):
             # This is the same pattern we follow for model json schemas - we attempt a core schema rebuild if we detect a mock
             if isinstance(adapter.core_schema, _mock_val_ser.MockCoreSchema):
                 adapter.core_schema.rebuild()
-                assert not isinstance(
-                    adapter.core_schema, _mock_val_ser.MockCoreSchema
-                ), 'this is a bug! please report it'
+                assert not isinstance(adapter.core_schema, _mock_val_ser.MockCoreSchema), (
+                    'this is a bug! please report it'
+                )
             inputs_.append((key, mode, adapter.core_schema))
 
         json_schemas_map, definitions = schema_generator_instance.generate_definitions(inputs_)

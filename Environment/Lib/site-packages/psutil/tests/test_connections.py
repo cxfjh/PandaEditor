@@ -25,7 +25,6 @@ from psutil import POSIX
 from psutil import SUNOS
 from psutil import WINDOWS
 from psutil._common import supports_ipv6
-from psutil._compat import PY3
 from psutil.tests import AF_UNIX
 from psutil.tests import HAS_NET_CONNECTIONS_UNIX
 from psutil.tests import SKIP_SYSCONS
@@ -109,7 +108,7 @@ class TestUnconnectedSockets(ConnectionTestCase):
 
     def get_conn_from_sock(self, sock):
         cons = this_proc_net_connections(kind='all')
-        smap = dict([(c.fd, c) for c in cons])
+        smap = {c.fd: c for c in cons}
         if NETBSD or FREEBSD:
             # NetBSD opens a UNIX socket to /var/log/run
             # so there may be more connections.
@@ -137,7 +136,7 @@ class TestUnconnectedSockets(ConnectionTestCase):
 
         # local address
         laddr = sock.getsockname()
-        if not laddr and PY3 and isinstance(laddr, bytes):
+        if not laddr and isinstance(laddr, bytes):
             # See: http://bugs.python.org/issue30205
             laddr = laddr.decode()
         if sock.family == AF_INET6:
@@ -185,7 +184,7 @@ class TestUnconnectedSockets(ConnectionTestCase):
         testfn = self.get_testfn()
         with closing(bind_unix_socket(testfn, type=SOCK_STREAM)) as sock:
             conn = self.check_socket(sock)
-            assert conn.raddr == ""  # noqa
+            assert conn.raddr == ""
             assert conn.status == psutil.CONN_NONE
 
     @pytest.mark.skipif(not POSIX, reason="POSIX only")
@@ -193,7 +192,7 @@ class TestUnconnectedSockets(ConnectionTestCase):
         testfn = self.get_testfn()
         with closing(bind_unix_socket(testfn, type=SOCK_STREAM)) as sock:
             conn = self.check_socket(sock)
-            assert conn.raddr == ""  # noqa
+            assert conn.raddr == ""
             assert conn.status == psutil.CONN_NONE
 
 
@@ -240,8 +239,8 @@ class TestConnectedSocket(ConnectionTestCase):
             assert len(cons) == 2
             if LINUX or FREEBSD or SUNOS or OPENBSD:
                 # remote path is never set
-                assert cons[0].raddr == ""  # noqa
-                assert cons[1].raddr == ""  # noqa
+                assert cons[0].raddr == ""
+                assert cons[1].raddr == ""
                 # one local address should though
                 assert testfn == (cons[0].laddr or cons[1].laddr)
             else:
@@ -357,14 +356,14 @@ class TestFilters(ConnectionTestCase):
         # launch various subprocess instantiating a socket of various
         # families and types to enrich psutil results
         tcp4_proc = self.pyrun(tcp4_template)
-        tcp4_addr = eval(wait_for_file(testfile, delete=True))  # noqa
+        tcp4_addr = eval(wait_for_file(testfile, delete=True))
         udp4_proc = self.pyrun(udp4_template)
-        udp4_addr = eval(wait_for_file(testfile, delete=True))  # noqa
+        udp4_addr = eval(wait_for_file(testfile, delete=True))
         if supports_ipv6():
             tcp6_proc = self.pyrun(tcp6_template)
-            tcp6_addr = eval(wait_for_file(testfile, delete=True))  # noqa
+            tcp6_addr = eval(wait_for_file(testfile, delete=True))
             udp6_proc = self.pyrun(udp6_template)
-            udp6_addr = eval(wait_for_file(testfile, delete=True))  # noqa
+            udp6_addr = eval(wait_for_file(testfile, delete=True))
         else:
             tcp6_proc = None
             udp6_proc = None
@@ -523,14 +522,14 @@ class TestSystemWideConnections(ConnectionTestCase):
         for _ in range(times):
             fname = self.get_testfn()
             fnames.append(fname)
-            src = textwrap.dedent("""\
+            src = textwrap.dedent(f"""\
                 import time, os
                 from psutil.tests import create_sockets
                 with create_sockets():
-                    with open(r'%s', 'w') as f:
+                    with open(r'{fname}', 'w') as f:
                         f.write("hello")
                     [time.sleep(0.1) for x in range(100)]
-                """ % fname)
+                """)
             sproc = self.pyrun(src)
             pids.append(sproc.pid)
 
@@ -561,7 +560,7 @@ class TestMisc(PsutilTestCase):
                 ints.append(num)
                 strs.append(str_)
         if SUNOS:
-            psutil.CONN_IDLE  # noqa
-            psutil.CONN_BOUND  # noqa
+            psutil.CONN_IDLE  # noqa: B018
+            psutil.CONN_BOUND  # noqa: B018
         if WINDOWS:
-            psutil.CONN_DELETE_TCB  # noqa
+            psutil.CONN_DELETE_TCB  # noqa: B018

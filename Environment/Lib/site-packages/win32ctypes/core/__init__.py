@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2014-2023 Enthought, Inc., Austin, TX
+# (C) Copyright 2014-2024 Enthought, Inc., Austin, TX
 # All right reserved.
 #
 # This file is open source software distributed according to the terms in
@@ -26,10 +26,11 @@ class BackendLoader(Loader):
     def __init__(self, redirect_module):
         self.redirect_module = redirect_module
 
-    def load_module(self, fullname):
-        module = importlib.import_module(self.redirect_module)
-        sys.modules[fullname] = module
-        return module
+    def create_module(self, spec):
+        return importlib.import_module(self.redirect_module)
+
+    def exec_module(self, module):
+        pass
 
 
 class BackendFinder(MetaPathFinder):
@@ -47,7 +48,8 @@ class BackendFinder(MetaPathFinder):
             else:
                 redirected = f'win32ctypes.core.cffi.{module_name}'
             loader = BackendLoader(redirected)
-            return importlib.machinery.ModuleSpec(module_name, loader)
+            return importlib.machinery.ModuleSpec(
+                f'win32ctypes.core.{module_name}', loader)
         else:
             return None
 

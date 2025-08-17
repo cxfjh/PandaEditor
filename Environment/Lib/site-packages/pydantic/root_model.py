@@ -12,9 +12,9 @@ from ._internal import _model_construction, _repr
 from .main import BaseModel, _object_setattr
 
 if typing.TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Literal
 
-    from typing_extensions import Literal, Self, dataclass_transform
+    from typing_extensions import Self, dataclass_transform
 
     from .fields import Field as PydanticModelField
     from .fields import PrivateAttr as PydanticModelPrivateAttr
@@ -33,7 +33,8 @@ RootModelRootType = typing.TypeVar('RootModelRootType')
 
 
 class RootModel(BaseModel, typing.Generic[RootModelRootType], metaclass=_RootModelMetaclass):
-    """Usage docs: https://docs.pydantic.dev/2.10/concepts/models/#rootmodel-and-custom-root-types
+    """!!! abstract "Usage Documentation"
+        [`RootModel` and Custom Root Types](../concepts/models.md#rootmodel-and-custom-root-types)
 
     A Pydantic `BaseModel` for the root object of the model.
 
@@ -124,7 +125,7 @@ class RootModel(BaseModel, typing.Generic[RootModelRootType], metaclass=_RootMod
             include: Any = None,
             exclude: Any = None,
             context: dict[str, Any] | None = None,
-            by_alias: bool = False,
+            by_alias: bool | None = None,
             exclude_unset: bool = False,
             exclude_defaults: bool = False,
             exclude_none: bool = False,

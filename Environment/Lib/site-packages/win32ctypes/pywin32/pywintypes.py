@@ -7,6 +7,9 @@
 #
 """ A module which supports common Windows types. """
 import contextlib
+import collections
+import time
+from datetime import datetime as _datetime
 
 
 class error(Exception):
@@ -35,3 +38,30 @@ def pywin32error():
         if not hasattr(exception, 'function'):
             exception.function = 'unknown'
         raise error(exception.winerror, exception.function, exception.strerror)
+
+
+class datetime(_datetime):
+
+    def Format(self, fmt='%c'):
+        return self.strftime(fmt)
+
+
+def Time(value):
+    if isinstance(value, datetime):
+        return value
+    elif hasattr(value, 'timetuple'):
+        timetuple = value.timetuple()
+        return datetime.fromtimestamp(time.mktime(timetuple))
+    elif isinstance(value, collections.abc.Sequence):
+        time_value = time.mktime(value[:9])
+        if len(value) == 10:
+            time_value += value[9] / 1000.0
+        return datetime.fromtimestamp(time_value)
+    else:
+        try:
+            return datetime.fromtimestamp(value)
+        except OSError as error:
+            if error.errno == 22:
+                raise ValueError(error.strerror)
+            else:
+                raise

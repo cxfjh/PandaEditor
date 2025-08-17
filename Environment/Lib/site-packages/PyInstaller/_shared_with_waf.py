@@ -51,6 +51,12 @@ def _pyi_machine(machine, system):
         else:
             return "intel"
 
+    if system == "SunOS":
+        if machine.lower() in ("x86", "i86pc"):
+            return "intel"
+        else:
+            return "sparc"
+
     if system != "Linux":
         # No architecture specifier for anything par Linux.
         # - macOS is on two 64 bit architectures, but they are merged into one "universal2" bootloader.
