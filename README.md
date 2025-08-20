@@ -52,7 +52,7 @@
 
 ## 官方网站
 
-- [PandaEditor](https://cxfjh.github.io/PandaEditorHub/)
+- [PandaEditor](https://cxfjh.github.io)
 
 ## 开源协议
 
