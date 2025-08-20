@@ -12,6 +12,7 @@ from src.utils.FileOps import open_file, read_file_content, save_file, save_as_f
 class MainWindowUI:
     def __init__(self):
         # 初始化UI组件变量（避免运行时属性错误）
+        self.syntax_hint = None
         self.signals = None  # 信号对象，用于跨窗口通信
         self.central_widget = None  # 主窗口中心部件
         self.horizontal_layout_widget = None  # 水平布局容器
@@ -103,25 +104,24 @@ class MainWindowUI:
         # 绑定光标位置变化事件（用于实时更新行号）
         self.text_edit.cursorPositionChanged.connect(self.on_cursor_position_changed)
 
+        from src.utils.SyntaxHint import SyntaxHintManager  # 假设管理器在该路径
+        self.syntax_hint = SyntaxHintManager(self.text_edit)
+
         def init_style(font_size=25, dark_mode=True, syntax_highlight=True, window_top=False):
             """初始化文本编辑区样式（字体、主题、语法高亮等）"""
             # 设置字体（默认为楷体，大小由参数指定）
             font = QtGui.QFont()
-            font.setFamily("楷体")
+            font.setFamily("YaHei Consolas Hybrid")
             font.setPointSize(font_size)
             self.text_edit.setFont(font)
 
             # 初始化语法高亮（根据配置决定是否启用）
-            if syntax_highlight:
-                self.highlighter = ChineseHighlighter(self.text_edit.document())
-            else:
-                self.highlighter = None  # 禁用高亮
+            if syntax_highlight: self.highlighter = ChineseHighlighter(self.text_edit.document())
+            else: self.highlighter = None  # 禁用高亮
 
             # 设置深色/浅色主题
-            if dark_mode:
-                self.text_edit.setStyleSheet("background-color: #1f1f1f; color: #cccccc;")
-            else:
-                self.text_edit.setStyleSheet("background-color: #ffffff; color: #0d0d10;")
+            if dark_mode: self.text_edit.setStyleSheet("background-color: #1f1f1f; color: #cccccc;")
+            else: self.text_edit.setStyleSheet("background-color: #ffffff; color: #0d0d10;")
 
             # 设置窗口是否置顶
             main_window.setWindowFlag(QtCore.Qt.WindowType.WindowStaysOnTopHint, window_top)
@@ -134,14 +134,9 @@ class MainWindowUI:
         if read_config("PersonalConfig.json"):
             try:
                 settings = read_config("PersonalConfig.json")
-                # 应用保存的样式配置
                 init_style(settings['fontSize'], settings['darkMode'], settings['highlightSyntax'], settings['windowTop'])
-            except Exception as e:
-                # 配置读取失败时提示错误
-                QtWidgets.QMessageBox.critical(main_window, "样式配置", "配置样式文件读取失败，请检查配置文件内容。\n 错误信息：\n" + str(e))
-        else:
-            # 无配置时使用默认样式
-            init_style()
+            except Exception as e: QtWidgets.QMessageBox.critical(main_window, "样式配置", "配置样式文件读取失败，请检查配置文件内容。\n 错误信息：\n" + str(e))
+        else: init_style() # 无配置时使用默认样式
 
         # 文本编辑区其他设置
         self.text_edit.setTabChangesFocus(True)  # Tab键切换焦点（而非插入制表符）
@@ -274,8 +269,8 @@ class MainWindowUI:
 
         # 更新状态栏文本（显示行号、文件路径、版本）
         self.status_label.setText(
-            f"行号: {cursor_line_number}    文件：{read_config('FileConfig.json', 'SourceCodePath')}/"
-            f"{read_config('FileConfig.json', 'CodeName')}.cn     版本: v0.1.0"
+            f"行号: {cursor_line_number}    文件：{read_config('FileConfig.json', 'SourceCodePath')}"
+            f"{read_config('FileConfig.json', 'CodeName')}.cn     版本: v0.1.1"
         )
 
 
@@ -329,7 +324,7 @@ class MainWindowUI:
         self.compile_action.triggered.connect(lambda: (compile_code(self.text_edit.toPlainText()), save_file(self.text_edit.toPlainText())))
 
         # 打开官方网站
-        self.website_action.triggered.connect(lambda: os.startfile('https://cxfjh.github.io/PandaEditorHub/'))
+        self.website_action.triggered.connect(lambda: os.startfile('https://cxfjh.github.io'))
 
         # 打开GitHub开源地址
         self.github_action.triggered.connect(lambda: os.startfile('https://github.com/cxfjh/PandaEditor'))
@@ -354,7 +349,7 @@ class MainWindowUI:
         keyboard.add_hotkey('Ctrl+O', lambda: (open_file(), self.text_edit.setPlainText(read_file_content())))
         keyboard.add_hotkey('ctrl+S', lambda: save_file(self.text_edit.toPlainText()))
         keyboard.add_hotkey('Ctrl+Shift+S', lambda: save_as_file(self.text_edit.toPlainText()))
-        keyboard.add_hotkey('Ctrl+R', lambda: (run_code(self.text_edit.toPlainText()),save_file(self.text_edit.toPlainText())))
+        keyboard.add_hotkey('Ctrl+R', lambda: (run_code(self.text_edit.toPlainText()), save_file(self.text_edit.toPlainText())))
         keyboard.add_hotkey('Ctrl+B', lambda: (compile_code(self.text_edit.toPlainText()), save_file(self.text_edit.toPlainText())))
         keyboard.add_hotkey('Ctrl+Shift+U', uninstall_program)
         keyboard.add_hotkey('Ctrl+Shift+R', reset_program)

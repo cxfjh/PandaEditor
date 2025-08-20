@@ -28,7 +28,7 @@ DEFAULT_FILE_CONFIG = {
 
 # 默认个性化配置（初始值）
 DEFAULT_PERSONAL_CONFIG = {
-    "fontSize": 25,
+    "fontSize": 20,
     "darkMode": True,
     "highlightSyntax": True,
     "windowTop": False,
@@ -59,21 +59,21 @@ def init_file_config():
             from src.utils.FileOps import split_file_path
             split_file_path(user_file_path)
 
-    except Exception as e:
-        messagebox.showerror("配置初始化失败", f"初始化配置文件时出错：\n{str(e)}")
+        # 如果 CodeName 为空自动在根目录创建一个文件Code.cn
+        if not read_config("FileConfig.json", "CodeName"):
+            code_dir = os.path.join(DEFAULT_FILE_CONFIG["Root"], 'code')
+            code_file_path = os.path.join(code_dir, 'code.cn')
+
+            os.makedirs(code_dir, exist_ok=True)
+            with open(code_file_path, 'w', encoding='utf-8') as f: f.write("@帮助")
+
+            update_config("FileConfig.json", "CodeName", "code")
+            update_config("FileConfig.json", "SourceCodePath", code_dir)
+    except Exception as e: messagebox.showerror("配置初始化失败", f"初始化配置文件时出错：\n{str(e)}")
 
 
 def read_config(file_name, key=None):
-    """
-    读取配置文件内容
-
-    参数:
-        file_name: 配置文件名（如"FileConfig.json"）
-        key: 可选，要读取的键名，不指定则返回整个配置字典
-
-    返回:
-        配置值（key存在时）或配置字典（key不存在时），失败返回None
-    """
+    """ 读取配置文件内容 """
     # 构建完整配置文件路径
     config_path = os.path.join(CONFIG_DIR, file_name)
 
@@ -82,41 +82,23 @@ def read_config(file_name, key=None):
             messagebox.showerror("文件不存在", f"配置文件未找到：\n{config_path}")
             return None
 
-        with open(config_path, 'r', encoding='utf-8') as f:
-            config_data = json.load(f)
+        with open(config_path, 'r', encoding='utf-8') as f: config_data = json.load(f)
 
-        if key is None:
-            return config_data  # 返回整个配置
-        else:
-            return config_data.get(key)  # 返回指定键值
-
-    except json.JSONDecodeError:
-        messagebox.showerror("格式错误", f"配置文件格式无效（JSON解析失败）：\n{config_path}")
-    except Exception as e:
-        messagebox.showerror("读取失败", f"读取配置文件时出错：\n{str(e)}")
-
+        if key is None: return config_data  # 返回整个配置
+        else: return config_data.get(key)  # 返回指定键值
+    except json.JSONDecodeError: messagebox.showerror("格式错误", f"配置文件格式无效（JSON解析失败）：\n{config_path}")
+    except Exception as e: messagebox.showerror("读取失败", f"读取配置文件时出错：\n{str(e)}")
     return None
 
 
 def update_config(file_name, key, new_value=None):
-    """
-    更新配置文件内容
-
-    参数:
-        file_name: 配置文件名（如"FileConfig.json"）
-        key: 要更新的键名，若new_value为None则key视为完整配置字典
-        new_value: 新值，若为None则直接写入key作为配置字典
-
-    返回:
-        成功返回True，失败返回False
-    """
+    """ 更新配置文件内容 """
     config_path = os.path.join(CONFIG_DIR, file_name)
 
     try:
         if new_value is None:
             # 直接覆盖整个配置文件（key作为完整配置字典）
-            with open(config_path, 'w', encoding='utf-8') as f:
-                json.dump(key, f, ensure_ascii=False, indent=4)
+            with open(config_path, 'w', encoding='utf-8') as f: json.dump(key, f, ensure_ascii=False, indent=4)
             return True
 
         # 部分更新（更新指定键）
@@ -125,21 +107,12 @@ def update_config(file_name, key, new_value=None):
             return False
 
         # 读取现有配置
-        with open(config_path, 'r', encoding='utf-8') as f:
-            config_data = json.load(f)
-
-        # 更新键值
-        config_data[key] = new_value
+        with open(config_path, 'r', encoding='utf-8') as f: config_data = json.load(f)
+        config_data[key] = new_value # 更新键值
 
         # 写入更新后的配置
-        with open(config_path, 'w', encoding='utf-8') as f:
-            json.dump(config_data, f, ensure_ascii=False, indent=4)
-
+        with open(config_path, 'w', encoding='utf-8') as f: json.dump(config_data, f, ensure_ascii=False, indent=4)
         return True
-
-    except json.JSONDecodeError:
-        messagebox.showerror("格式错误", f"配置文件格式无效（JSON解析失败）：\n{config_path}")
-    except Exception as e:
-        messagebox.showerror("更新失败", f"更新配置文件时出错：\n{str(e)}")
-
+    except json.JSONDecodeError: messagebox.showerror("格式错误", f"配置文件格式无效（JSON解析失败）：\n{config_path}")
+    except Exception as e: messagebox.showerror("更新失败", f"更新配置文件时出错：\n{str(e)}")
     return False

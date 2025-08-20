@@ -1,5 +1,4 @@
 from tkinter import messagebox
-
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Signal, QObject
 from src.utils.Config import read_config, update_config
@@ -105,7 +104,7 @@ class SettingsDialogUI:
         self._set_font(self.font_size_spinbox)
         self.font_size_spinbox.setMinimum(10)  # 最小字体10px
         self.font_size_spinbox.setMaximum(60)  # 最大字体60px
-        self.font_size_spinbox.setProperty("value", 25)  # 默认25px
+        self.font_size_spinbox.setProperty("value", 20)  # 默认20px
         self.font_size_spinbox.setObjectName("fontSizeSpinBox")
         self.font_size_layout.addWidget(self.font_size_spinbox)
 
@@ -247,8 +246,7 @@ class SettingsDialogUI:
             update_config("PersonalConfig.json", current_settings)
             # 发射信号，通知主窗口应用新设置
             self.signals.dialogClosed.emit(current_settings)
-        except Exception as e:
-            messagebox.showerror("设置保存", f"保存设置失败: {str(e)}")
+        except Exception as e: messagebox.showerror("设置保存", f"保存设置失败: {str(e)}")
 
 
     def _load_settings_from_config(self):
@@ -262,5 +260,4 @@ class SettingsDialogUI:
                 self.dark_mode_checkbox.setChecked(saved_settings["darkMode"])
                 self.syntax_highlight_checkbox.setChecked(saved_settings["highlightSyntax"])
                 self.window_top_checkbox.setChecked(saved_settings["windowTop"])
-        except Exception as e:
-            messagebox.showerror("设置加载", f"加载设置失败: {str(e)}")
+        except Exception as e: messagebox.showerror("设置加载", f"加载设置失败: {str(e)}")

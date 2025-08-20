@@ -30,5 +30,6 @@ BuiltinLibraryMethods.update(
         "系统*": "SystemLibrary",
         "并发*": "ConcurrentLibraries",
         "随机*": "RandomLibrary",
+        "错误处理*": "@_catch"
     }
 )

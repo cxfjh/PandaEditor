@@ -51,18 +51,12 @@ def _protect_parts(code_str):
 
 def _restore_parts(code_str, placeholders):
     """还原被保护的内容（将占位符替换回原始内容）"""
-    for placeholder, part in placeholders.items():
-        code_str = code_str.replace(placeholder, f'“{part}”')
+    for placeholder, part in placeholders.items(): code_str = code_str.replace(placeholder, f'“{part}”')
     return code_str
 
 
 def parse_code(code_str):
-    """
-    解析代码（替换中文关键词、符号为Python语法）
-
-    返回:
-        成功返回True，失败返回False
-    """
+    """ 解析代码（替换中文关键词、符号为Python语法） """
     try:
         config = _get_config()
         # 检查配置完整性
@@ -70,25 +64,16 @@ def parse_code(code_str):
             messagebox.showerror("配置错误", "请先指定文件路径（打开或保存文件）")
             return False
 
-        # 保护特殊部分
-        protected_str, placeholders = _protect_parts(code_str)
-
         # 替换语法关键词（使用预编译正则）
-        parsed_str = GRAMMAR_PATTERN.sub(lambda m: Grammar[m.group(0)], protected_str)
-
-        # 替换符号（使用预编译正则）
-        parsed_str = SYMBOLS_PATTERN.sub(lambda m: Symbols[m.group(0)], parsed_str)
-
-        # 还原保护部分
-        parsed_str = _restore_parts(parsed_str, placeholders)
-
-        # 替换中文特殊字符（使用预编译正则）
-        parsed_str = CHARACTER_PATTERN.sub(lambda m: CHARACTER_MAPPING[m.group(0)], parsed_str)
+        protected_str, placeholders = _protect_parts(code_str) # 保护特殊部分
+        parsed_str = GRAMMAR_PATTERN.sub(lambda m: Grammar[m.group(0)], protected_str) # 替换语法关键词（使用预编译正则）
+        parsed_str = SYMBOLS_PATTERN.sub(lambda m: Symbols[m.group(0)], parsed_str) # 替换符号（使用预编译正则）
+        parsed_str = _restore_parts(parsed_str, placeholders) # 还原保护部分
+        parsed_str = CHARACTER_PATTERN.sub(lambda m: CHARACTER_MAPPING[m.group(0)], parsed_str) # 替换中文特殊字符（使用预编译正则）
 
         # 写入Python文件
         os.makedirs(os.path.dirname(config["code_path"]), exist_ok=True)
-        with open(config["code_path"], 'w', encoding='utf-8') as f:
-            f.write(parsed_str)
+        with open(config["code_path"], 'w', encoding='utf-8') as f: f.write(parsed_str)
 
         return True
     except Exception as e:
@@ -106,8 +91,7 @@ def _run_thread():
 
         # 执行代码（捕获输出，便于调试）
         subprocess.run([config["python_dir"], config["code_path"]], cwd=os.path.dirname(config["code_path"]))
-    except Exception as e:
-        messagebox.showerror("线程运行失败", f"运行时错误：\n{str(e)}")
+    except Exception as e: messagebox.showerror("线程运行失败", f"运行时错误：\n{str(e)}")
 
 
 def run_code(text_code):
@@ -117,8 +101,7 @@ def run_code(text_code):
             # 启动守护线程（避免程序退出后残留）
             thread = threading.Thread(target=_run_thread, daemon=True)
             thread.start()
-        except Exception as e:
-            messagebox.showerror("线程启动失败", f"无法启动运行线程：\n{str(e)}")
+        except Exception as e: messagebox.showerror("线程启动失败", f"无法启动运行线程：\n{str(e)}")
 
 
 def _compile_thread():
@@ -139,8 +122,7 @@ def _compile_thread():
         ]
 
         # 若代码名以"-w"结尾，添加无控制台参数
-        if config["code_name"].endswith("-w"):
-            cmd.insert(3, "-w")  # 插入到"-F"之后
+        if config["code_name"].endswith("-w"): cmd.insert(3, "-w")  # 插入到"-F"之后
 
         # 执行编译命令（捕获输出）
         subprocess.run(cmd)
@@ -150,12 +132,9 @@ def _compile_thread():
         os.startfile(config["exe_path"])
 
         # 清理临时文件
-        _delete_garbage(config["python_dir"])  # 传入根目录所在配置
-
-    except subprocess.CalledProcessError as e:
-        messagebox.showerror("编译命令失败", f"编译出错：\n{e.stderr}")
-    except Exception as e:
-        messagebox.showerror("编译线程失败", f"编译时错误：\n{str(e)}")
+        _delete_garbage(config["python_dir"])
+    except subprocess.CalledProcessError as e: messagebox.showerror("编译命令失败", f"编译出错：\n{e.stderr}")
+    except Exception as e: messagebox.showerror("编译线程失败", f"编译时错误：\n{str(e)}")
 
 
 def compile_code(text_code):
@@ -165,8 +144,7 @@ def compile_code(text_code):
             thread = threading.Thread(target=_compile_thread, daemon=True)
             thread.start()
             messagebox.showinfo("编译中", "正在编译代码，请等待...\n（请勿重复操作）")
-        except Exception as e:
-            messagebox.showerror("线程启动失败", f"无法启动编译线程：\n{str(e)}")
+        except Exception as e: messagebox.showerror("线程启动失败", f"无法启动编译线程：\n{str(e)}")
 
 
 def _delete_garbage(root_dir):
@@ -177,15 +155,11 @@ def _delete_garbage(root_dir):
 
         # 清理build目录
         build_dir = os.path.join(root_path, "build")
-        if os.path.exists(build_dir) and os.path.isdir(build_dir):
-            shutil.rmtree(build_dir, ignore_errors=True)
+        if os.path.exists(build_dir) and os.path.isdir(build_dir): shutil.rmtree(build_dir, ignore_errors=True)
 
         # 清理.spec文件
         for filename in os.listdir(root_path):
             if filename.endswith('.spec'):
                 spec_file = os.path.join(root_path, filename)
-                if os.path.isfile(spec_file):
-                    os.remove(spec_file)
-    except Exception as e:
-        # 清理失败不阻塞主流程，仅打印日志
-        messagebox.showerror("临时文件", f"清理临时文件失败：{str(e)}")
+                if os.path.isfile(spec_file): os.remove(spec_file)
+    except Exception as e: messagebox.showerror("临时文件", f"清理临时文件失败：{str(e)}")
