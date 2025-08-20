@@ -12,7 +12,7 @@ KeyWords.update(
         "或者": "or", 
         "跳过": "continue",  
         "不是": "not",  
-        "是的": "is", 
+        "是的": "is",
     }
 )
 

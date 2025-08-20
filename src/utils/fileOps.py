@@ -1,4 +1,5 @@
 import os
+import shutil
 from tkinter import filedialog, messagebox
 from src.utils.Config import update_config, read_config
 
@@ -92,3 +93,29 @@ def read_file_content():
     except Exception as e:
         messagebox.showerror("读取文件失败", f"无法获取文件内容：\n{str(e)}")
         return None
+
+
+def import_file():
+    """读取扩展文件路径并复制移动"""
+    try:
+        # 打开文件选择对话框（仅显示.py文件）
+        file_path = filedialog.askopenfilename(filetypes=[("PY Files", "*.py")], title="导入PY文件")
+        if not file_path: return  # 用户取消选择
+
+        # 标准化路径（处理斜杠/反斜杠问题）
+        normalized_path = os.path.normpath(file_path)
+        # 检查文件是否存在
+        if not os.path.exists(normalized_path):
+            messagebox.showerror("导入文件失败", f"文件不存在：\n{normalized_path}")
+            return
+
+        # 复制文件到扩展库目录
+        import_dir = os.path.join(read_config("FileConfig.json", "Root"), "File")
+        if not os.path.exists(import_dir): os.makedirs(import_dir) # 确保目录存在
+
+        # 复制文件
+        import_file_name = os.path.basename(normalized_path)
+        import_file_path = os.path.join(import_dir, import_file_name)
+        shutil.copyfile(normalized_path, import_file_path) # 复制文件
+        messagebox.showinfo("导入扩展", f"导入成功：\n{import_file_path}\n重新启动程序后生效")
+    except Exception as e: messagebox.showerror("导入文件失败", f"导入失败：\n{str(e)}")

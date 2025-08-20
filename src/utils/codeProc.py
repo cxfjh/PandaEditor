@@ -29,6 +29,7 @@ def _get_config():
     icon_path = read_config("FileConfig.json", "ICON")  # 从配置读取图标路径，避免硬编码
     exe_path = os.path.join(source_code_path, code_name) if (source_code_path and code_name) else ""
     code_path = f"{exe_path}.py" if exe_path else ""
+
     return {
         "python_dir": python_dir,
         "exe_path": exe_path,

@@ -19,8 +19,8 @@ DEFAULT_FILE_CONFIG = {
     "Root": ROOT_DIR,
     "ConfigDirectory": os.path.join(CONFIG_DIR, 'FileConfig.json'),
     "PersonalConfig": os.path.join(CONFIG_DIR, 'PersonalConfig.json'),
-    "PythonDirectory": os.path.join(ROOT_DIR, 'Environment', 'python.exe'), # 运行时环境
-    # "PythonDirectory": os.path.join(ROOT_DIR, 'python.exe'), # 编译时环境
+    # "PythonDirectory": os.path.join(ROOT_DIR, 'Environment', 'python.exe'), # 运行时环境
+    "PythonDirectory": os.path.join(ROOT_DIR, 'python.exe'), # 编译时环境
     "ICON": os.path.join(ROOT_DIR, 'src', 'static', 'logo.ico'),
     "SourceCodePath": "",
     "CodeName": "",
@@ -78,9 +78,7 @@ def read_config(file_name, key=None):
     config_path = os.path.join(CONFIG_DIR, file_name)
 
     try:
-        if not os.path.exists(config_path):
-            messagebox.showerror("文件不存在", f"配置文件未找到：\n{config_path}")
-            return None
+        if not os.path.exists(config_path): return None
 
         with open(config_path, 'r', encoding='utf-8') as f: config_data = json.load(f)
 

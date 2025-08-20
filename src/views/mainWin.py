@@ -6,12 +6,13 @@ from src.utils.CodeProc import run_code, compile_code
 from src.utils.Config import read_config
 from src.views.SetWin import SettingsDialogUI, DialogSignals
 from src.utils.SetPage import reset_program, uninstall_program
-from src.utils.FileOps import open_file, read_file_content, save_file, save_as_file
+from src.utils.FileOps import open_file, read_file_content, save_file, save_as_file, import_file
 
 
 class MainWindowUI:
     def __init__(self):
         # 初始化UI组件变量（避免运行时属性错误）
+        self.import_action = None
         self.syntax_hint = None
         self.signals = None  # 信号对象，用于跨窗口通信
         self.central_widget = None  # 主窗口中心部件
@@ -186,6 +187,9 @@ class MainWindowUI:
         self.save_as_action = QtGui.QAction(parent=main_window)
         self.save_as_action.setObjectName("save_as_action")
 
+        self.import_action = QtGui.QAction(parent=main_window)
+        self.import_action.setObjectName("import_action")
+
         self.run_action = QtGui.QAction(parent=main_window)
         self.run_action.setObjectName("run_action")
 
@@ -222,6 +226,7 @@ class MainWindowUI:
         self.file_menu.addAction(self.open_action)
         self.file_menu.addAction(self.save_action)
         self.file_menu.addAction(self.save_as_action)
+        self.file_menu.addAction(self.import_action)
 
         self.code_menu.addAction(self.run_action)
         self.code_menu.addAction(self.compile_action)
@@ -270,7 +275,7 @@ class MainWindowUI:
         # 更新状态栏文本（显示行号、文件路径、版本）
         self.status_label.setText(
             f"行号: {cursor_line_number}    文件：{read_config('FileConfig.json', 'SourceCodePath')}"
-            f"{read_config('FileConfig.json', 'CodeName')}.cn     版本: v0.1.1"
+            f"{read_config('FileConfig.json', 'CodeName')}.cn     版本: v0.1.0"
         )
 
 
@@ -291,6 +296,7 @@ class MainWindowUI:
         self.open_action.setText(_translate("MainWindow", "打开文件  Ctrl+O"))
         self.save_action.setText(_translate("MainWindow", "保存文件  Ctrl+S"))
         self.save_as_action.setText(_translate("MainWindow", "另存文件  Ctrl+Shift+S"))
+        self.import_action.setText(_translate("MainWindow", "导入扩展  Ctrl+I"))
         self.run_action.setText(_translate("MainWindow", "运行代码  Ctrl+R"))
         self.compile_action.setText(_translate("MainWindow", "编译代码  Ctrl+B"))
         self.website_action.setText(_translate("MainWindow", "官方网站"))
@@ -316,6 +322,9 @@ class MainWindowUI:
 
         # 另存为：将内容保存到新文件
         self.save_as_action.triggered.connect(lambda: save_as_file(self.text_edit.toPlainText()))
+
+        # 导入扩展：调用importExtension()导入扩展
+        self.import_action.triggered.connect(import_file)
 
         # 运行代码：先保存内容，再执行runCode()
         self.run_action.triggered.connect(lambda: (run_code(self.text_edit.toPlainText()), save_file(self.text_edit.toPlainText())))
@@ -349,6 +358,7 @@ class MainWindowUI:
         keyboard.add_hotkey('Ctrl+O', lambda: (open_file(), self.text_edit.setPlainText(read_file_content())))
         keyboard.add_hotkey('ctrl+S', lambda: save_file(self.text_edit.toPlainText()))
         keyboard.add_hotkey('Ctrl+Shift+S', lambda: save_as_file(self.text_edit.toPlainText()))
+        keyboard.add_hotkey('Ctrl+I', import_file)
         keyboard.add_hotkey('Ctrl+R', lambda: (run_code(self.text_edit.toPlainText()), save_file(self.text_edit.toPlainText())))
         keyboard.add_hotkey('Ctrl+B', lambda: (compile_code(self.text_edit.toPlainText()), save_file(self.text_edit.toPlainText())))
         keyboard.add_hotkey('Ctrl+Shift+U', uninstall_program)

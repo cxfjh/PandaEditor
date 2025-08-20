@@ -1,4 +1,6 @@
 # 内置库方法
+from src.utils.Extend import extract_fun
+
 BuiltinLibraryMethods = {}
 
 
@@ -30,6 +32,14 @@ BuiltinLibraryMethods.update(
         "系统*": "SystemLibrary",
         "并发*": "ConcurrentLibraries",
         "随机*": "RandomLibrary",
-        "错误处理*": "@_catch"
+        "错误器*": "@_catch",
+        "线程器*": "@_thread",
+        "计时器*": "@_timeout",
+        "间隔器*": "@_interval",
+        "循环器*": "@_loop",
     }
 )
+
+
+# 扩展库方法
+extract_fun(BuiltinLibraryMethods)
