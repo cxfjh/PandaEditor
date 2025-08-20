@@ -19,8 +19,8 @@ DEFAULT_FILE_CONFIG = {
     "Root": ROOT_DIR,
     "ConfigDirectory": os.path.join(CONFIG_DIR, 'FileConfig.json'),
     "PersonalConfig": os.path.join(CONFIG_DIR, 'PersonalConfig.json'),
-    # "PythonDirectory": os.path.join(ROOT_DIR, 'Environment', 'python.exe'), # 运行时环境
-    "PythonDirectory": os.path.join(ROOT_DIR, 'python.exe'), # 编译时环境
+    "PythonDirectory": os.path.join(ROOT_DIR, 'Environment', 'python.exe'), # 运行时环境
+    # "PythonDirectory": os.path.join(ROOT_DIR, 'python.exe'), # 编译时环境
     "ICON": os.path.join(ROOT_DIR, 'src', 'static', 'logo.ico'),
     "SourceCodePath": "",
     "CodeName": "",
