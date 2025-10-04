@@ -7,7 +7,9 @@ from src.utils.Config import read_config
 def extend_library(directory):
     """ 遍历配置目录下所有.py文件，以文件名作为库名加载内容到directory字典 """
     try: dir_file = os.path.join(read_config("FileConfig.json", "Root"), "File")
-    except Exception as e: return
+    except Exception as e:
+        print(e)
+        return
 
     if not os.path.exists(dir_file):
         messagebox.showwarning("目录不存在", f"扩展库目录不存在: {dir_file}")
@@ -28,7 +30,9 @@ def extend_library(directory):
 def extract_fun(directory):
     """ 遍历配置目录下所有.py文件，提取所有函数名并以"函数名:函数名"格式更新到directory字典 """
     try: dir_file = os.path.join(read_config("FileConfig.json", "Root"), "File") # 获取目标目录路径
-    except Exception as e: return
+    except Exception as e:
+        print(e)
+        return
 
     # 检查目录是否存在
     if not os.path.exists(dir_file):

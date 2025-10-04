@@ -274,7 +274,7 @@ class MainWindowUI:
 
         # 更新状态栏文本（显示行号、文件路径、版本）
         self.status_label.setText(
-            f"行号: {cursor_line_number}    文件：{read_config('FileConfig.json', 'SourceCodePath')}"
+            f"行号: {cursor_line_number}    文件：{read_config('FileConfig.json', 'SourceCodePath')}\\"
             f"{read_config('FileConfig.json', 'CodeName')}.cn     版本: v0.1.0"
         )
 
