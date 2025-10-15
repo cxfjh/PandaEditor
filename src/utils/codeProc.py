@@ -92,7 +92,8 @@ def _run_thread():
 
         # 执行代码（捕获输出，便于调试）
         subprocess.run([config["python_dir"], config["code_path"]], cwd=os.path.dirname(config["code_path"]))
-    except Exception as e: messagebox.showerror("线程运行失败", f"运行时错误：\n{str(e)}")
+    except Exception as e:
+        messagebox.showerror("线程运行失败", f"运行时错误：\n{str(e)}")
 
 
 def run_code(text_code):
@@ -102,7 +103,8 @@ def run_code(text_code):
             # 启动守护线程（避免程序退出后残留）
             thread = threading.Thread(target=_run_thread, daemon=True)
             thread.start()
-        except Exception as e: messagebox.showerror("线程启动失败", f"无法启动运行线程：\n{str(e)}")
+        except Exception as e:
+            messagebox.showerror("线程启动失败", f"无法启动运行线程：\n{str(e)}")
 
 
 def _compile_thread():
@@ -134,8 +136,10 @@ def _compile_thread():
 
         # 清理临时文件
         _delete_garbage(config["python_dir"])
-    except subprocess.CalledProcessError as e: messagebox.showerror("编译命令失败", f"编译出错：\n{e.stderr}")
-    except Exception as e: messagebox.showerror("编译线程失败", f"编译时错误：\n{str(e)}")
+    except subprocess.CalledProcessError as e:
+        messagebox.showerror("编译命令失败", f"编译出错：\n{e.stderr}")
+    except Exception as e:
+        messagebox.showerror("编译线程失败", f"编译时错误：\n{str(e)}")
 
 
 def compile_code(text_code):
@@ -145,14 +149,15 @@ def compile_code(text_code):
             thread = threading.Thread(target=_compile_thread, daemon=True)
             thread.start()
             messagebox.showinfo("编译中", "正在编译代码，请等待...\n（请勿重复操作）")
-        except Exception as e: messagebox.showerror("线程启动失败", f"无法启动编译线程：\n{str(e)}")
+        except Exception as e:
+            messagebox.showerror("线程启动失败", f"无法启动编译线程：\n{str(e)}")
 
 
 def _delete_garbage(root_dir):
     """清理编译生成的临时文件（build目录和.spec文件）"""
     try:
         # 从Python路径推导根目录（或直接从配置读取）
-        root_path = os.path.dirname(os.path.dirname(root_dir))  # 适配路径结构
+        root_path = os.path.dirname(root_dir)  # 适配路径结构
 
         # 清理build目录
         build_dir = os.path.join(root_path, "build")
@@ -163,4 +168,5 @@ def _delete_garbage(root_dir):
             if filename.endswith('.spec'):
                 spec_file = os.path.join(root_path, filename)
                 if os.path.isfile(spec_file): os.remove(spec_file)
-    except Exception as e: messagebox.showerror("临时文件", f"清理临时文件失败：{str(e)}")
+    except Exception as e:
+        messagebox.showerror("临时文件", f"清理临时文件失败：{str(e)}")
