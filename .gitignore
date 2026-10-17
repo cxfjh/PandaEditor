@@ -1,0 +1,7 @@
+.venv/
+.idea/
+src/config
+code/
+build/
+*.exe
+build.bat
